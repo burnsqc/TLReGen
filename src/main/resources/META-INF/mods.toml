@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+logoFile="technologica.png"
+license="All Rights Reserved"
+
+[[mods]]
+	modId="tlregen"
+	version="1.0.0"
+	displayName="TLReGen"
+	credits="Special thanks to the generous help of the Forge/NeoForge Discord community!"
+	authors="burnsqc"
+	description='''
+    An ambitious mod aiming to provide a primarily technical progression with considerable breadth and depth.  Technologica adds new trees, crops, minerals, and creatures both fantastical and real to the overworld.'''
+
+[[dependencies.tlregen]]
+    modId="forge" 
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.tlregen]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="NONE"
+    side="BOTH"

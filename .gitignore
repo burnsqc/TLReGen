@@ -1,0 +1,22 @@
+# eclipse
+bin
+gradle
+*.launch
+.settings
+.metadata
+.classpath
+.project
+src/generated/resources/.cache
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+run-data
+javadoc
+
+# Files from Forge MDK
+changelog.txt

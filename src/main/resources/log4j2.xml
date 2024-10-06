@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" shutdownHook="disable">
+  <filters>
+    <MarkerFilter marker="REGISTRATION" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+  </filters>
+  <Appenders>
+    <TerminalConsole name="Console">
+      <PatternLayout>
+        <LoggerNamePatternSelector defaultPattern="%d{HH:mm:ss.SSS} (%marker) %m%n"/>
+      </PatternLayout>
+    </TerminalConsole>
+  </Appenders>
+  <Loggers>
+    <Root level="all">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>
