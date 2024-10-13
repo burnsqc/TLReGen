@@ -7,10 +7,10 @@ license="All Rights Reserved"
 	modId="tlregen"
 	version="1.0.0"
 	displayName="TLReGen"
-	credits="Special thanks to the generous help of the Forge/NeoForge Discord community!"
+	credits="burnsqc"
 	authors="burnsqc"
 	description='''
-    An ambitious mod aiming to provide a primarily technical progression with considerable breadth and depth.  Technologica adds new trees, crops, minerals, and creatures both fantastical and real to the overworld.'''
+    TL Registration/Generation.  An API between Forge and your mod that streamlines commonly executed initialization, registration, setup, and resource generation logic.'''
 
 [[dependencies.tlregen]]
     modId="forge" 
