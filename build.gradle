@@ -1,9 +1,9 @@
 plugins {
     id 'eclipse'
-    id 'idea'
+    id 'java'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    //id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 version = '0.0.1'
@@ -19,7 +19,6 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 minecraft {
     mappings channel: 'official', version: '1.20.1'
     copyIdeResources = true
-    // makeObfSourceJar = false 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -61,15 +60,20 @@ sourceSets.main.resources {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.3.7'
     // Apply Mixin AP
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    // annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
-mixin {
-	add sourceSets.main, 'tlregen.mixins.refmap.json'
-	config 'tlregen.mixins.json'
-	debug.verbose = true
-    debug.export = true
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
+
+//mixin {
+//	add sourceSets.main, 'tlregen.mixins.refmap.json'
+//	config 'tlregen.mixins.json'
+//	debug.verbose = true
+//    debug.export = true
+//}
 
 tasks.named('jar', Jar).configure {
     manifest {
@@ -84,18 +88,26 @@ tasks.named('jar', Jar).configure {
         ])
     }
 
-    finalizedBy 'reobfJar'
+    //finalizedBy 'reobfJar'
+}
+
+artifacts {
+	archives javadocJar
+	archives sourcesJar
 }
 
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
             artifact jar
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+        	name = "localMaven"
+            url "file:///${project.projectDir}/maven"
         }
     }
 }

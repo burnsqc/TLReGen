@@ -1,11 +1,11 @@
 modLoader="javafml"
 loaderVersion="[47,)"
-logoFile="technologica.png"
+logoFile="tlregen.png"
 license="All Rights Reserved"
 
 [[mods]]
 	modId="tlregen"
-	version="1.0.0"
+	version="0.0.1"
 	displayName="TLReGen"
 	credits="burnsqc"
 	authors="burnsqc"
