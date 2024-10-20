@@ -8,6 +8,9 @@ gradle
 .project
 src/generated/resources/.cache
 
+# maven
+maven
+
 # gradle
 build
 .gradle
