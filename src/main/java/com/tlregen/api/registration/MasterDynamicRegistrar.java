@@ -13,9 +13,10 @@ import com.tlregen.util.TextUtil;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class MasterDynamicRegistrar {
@@ -40,8 +41,8 @@ public class MasterDynamicRegistrar {
 		return dynamicRegister;
 	}
 
-	@SubscribeEvent
-	protected final void initDeferredRegisters(final FMLConstructModEvent event) {
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	protected final void bindValues(final GatherDataEvent event) {
 		LOGGER.info(REGISTRATION, modMarker + " INITIALIZATION STARTING");
 		registries.forEach((reg, counter) -> {
 			counter.bootstrap.get();
@@ -49,6 +50,16 @@ public class MasterDynamicRegistrar {
 			LOGGER.info(REGISTRATION, modMarker + " " + TextUtil.stringToAllCapsName(reg.location().toString()) + " INITIALIZED " + counter.initialized);
 		});
 		LOGGER.info(REGISTRATION, modMarker + " INITIALIZATION COMPLETE");
+
+		// LOGGER.info(REGISTRATION, modMarker + " BINDING STARTING");
+		// registries.forEach((reg, counter) -> counter.dynamicRegister.getEntries().forEach((key, value) -> {
+		// if (value != null) {
+		// value.first.bindValue(value.second.get());
+		// } else {
+		// LOGGER.error(REGISTRATION, modMarker + " BINDING ERROR" + key);
+		// }
+		// }));
+		// LOGGER.info(REGISTRATION, modMarker + " BINDING COMPLETE");
 	}
 
 	private static class RegistrationTracker<R> {

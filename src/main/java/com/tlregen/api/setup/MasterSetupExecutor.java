@@ -6,14 +6,14 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.function.Supplier;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.tlregen.TLReGen;
 import com.tlregen.util.TextUtil;
+import com.tlregen.util.ValidationLevel;
 
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -44,28 +44,53 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
+/**
+ * This class handles various setup activities that follow registration. Create an instance of this class in your mod and reference the instance as needed.
+ */
 public class MasterSetupExecutor {
-	protected String modMarker;
-	protected static final Logger LOGGER = LogManager.getLogger("TLREGEN");
 	protected static final Marker SETUP = MarkerManager.getMarker("SETUP");
-
+	protected String modMarker;
+	private CommonModEventListeners commonModEventListeners;
 	private CommonForgeEventListeners commonForgeEventListeners;
 	private ClientModEventListeners clientModEventListeners;
-	private CommonModEventListeners commonModEventListeners;
 
+	/**
+	 * Construct a new instance of MasterSetupExecutor.
+	 * <p>Example call:<br>
+	 * {@code
+	 * private static final MasterSetupExecutor MY_MASTER_SETUP_EXECUTOR = new MasterSetupExecutor(MOD_ID); 
+	 * }
+	 * 
+	 * @param modid The mod id for your mod. This is likely already declared in your main mod class for a variety of other purposes.
+	 */
 	public MasterSetupExecutor(String modid) {
 		modMarker = "(" + TextUtil.stringToAllCapsName(modid) + ")";
-
-		commonForgeEventListeners = new CommonForgeEventListeners(modid);
 		commonModEventListeners = new CommonModEventListeners(modid);
-
+		commonForgeEventListeners = new CommonForgeEventListeners(modid);
 		if (FMLEnvironment.dist == Dist.CLIENT) {
 			clientModEventListeners = new ClientModEventListeners(modid);
 		}
-
-		LOGGER.info(SETUP, modMarker + " NEW MASTER SETUP EXECUTOR CONSTRUCTED");
+		TLReGen.LOGGER.info(SETUP, modMarker + " NEW MASTER SETUP EXECUTOR CONSTRUCTED");
 	}
 
+	/**
+	 * Change the validation level of MasterSetupExecutor. Default is ValidationLevel.MAX.
+	 * 
+	 * @param validationLevel
+	 * 
+	 * @return
+	 */
+	public MasterSetupExecutor validationLevel(ValidationLevel validationLevel) {
+		commonModEventListeners.validationLevel = validationLevel;
+		commonForgeEventListeners.validationLevel = validationLevel;
+		return this;
+	}
+
+	/**
+	 * Add attributes to entities.
+	 * 
+	 * @param entityAttributes A supplier of a Map of Entity Types and their respective Attribute Suppliers.
+	 */
 	public void addEntityAttributes(Supplier<Map<EntityType<? extends LivingEntity>, AttributeSupplier>> entityAttributes) {
 		commonModEventListeners.entityAttributes = entityAttributes;
 	}

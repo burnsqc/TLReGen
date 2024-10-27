@@ -5,12 +5,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.function.Supplier;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
-
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.tlregen.TLReGen;
 import com.tlregen.util.TextUtil;
 
 import net.minecraft.client.Minecraft;
@@ -49,10 +45,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
-public class ClientModEventListeners {
+class ClientModEventListeners {
 	protected String modMarker;
-	protected static final Logger LOGGER = LogManager.getLogger("TLREGEN");
-	protected static final Marker SETUP = MarkerManager.getMarker("SETUP");
 
 	Supplier<Map<SkullBlock.Type, ModelLayerLocation>> skullModels;
 	Supplier<Map<ModelLayerLocation, LayerDefinition>> layerDefinitions;
@@ -74,62 +68,62 @@ public class ClientModEventListeners {
 	}
 
 	@SubscribeEvent
-	public final void onEntityRenderersEvent$CreateSkullModels(final EntityRenderersEvent.CreateSkullModels event) {
+	protected final void onEntityRenderersEvent$CreateSkullModels(final EntityRenderersEvent.CreateSkullModels event) {
 		skullModels.get().forEach((k, v) -> event.registerSkullModel(k, new SkullModel(event.getEntityModelSet().bakeLayer(v))));
-		LOGGER.info(SETUP, modMarker + " SKULL MODELS CREATED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " SKULL MODELS CREATED ");
 	}
 
 	@SubscribeEvent
-	public final void onEntityRenderersEvent$RegisterLayerDefinitions(final EntityRenderersEvent.RegisterLayerDefinitions event) {
+	protected final void onEntityRenderersEvent$RegisterLayerDefinitions(final EntityRenderersEvent.RegisterLayerDefinitions event) {
 		layerDefinitions.get().forEach((k, v) -> event.registerLayerDefinition(k, () -> v));
-		LOGGER.info(SETUP, modMarker + " LAYER DEFINITIONS REGISTERED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " LAYER DEFINITIONS REGISTERED ");
 	}
 
 	@SubscribeEvent
-	public final void onEntityRenderersEvent$RegisterRenderers(final EntityRenderersEvent.RegisterRenderers event) {
+	protected final void onEntityRenderersEvent$RegisterRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 		entityRenderers.get().forEach((k, v) -> event.registerEntityRenderer(k, v));
-		LOGGER.info(SETUP, modMarker + " ENTITY RENDERERS REGISTERED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " ENTITY RENDERERS REGISTERED ");
 		blockEntityRenderers.get().forEach((k, v) -> event.registerBlockEntityRenderer(k, v));
-		LOGGER.info(SETUP, modMarker + " BLOCK ENTITY RENDERERS REGISTERED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " BLOCK ENTITY RENDERERS REGISTERED ");
 	}
 
 	@SubscribeEvent
-	public final void onModelEvent$RegisterAdditional(final ModelEvent.RegisterAdditional event) {
+	protected final void onModelEvent$RegisterAdditional(final ModelEvent.RegisterAdditional event) {
 		additionalModels.get().forEach((model) -> event.register(model));
-		LOGGER.info(SETUP, modMarker + " ADDITIONAL MODELS REGISTERED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " ADDITIONAL MODELS REGISTERED ");
 	}
 
 	@SubscribeEvent
-	public final void onRegisterColorHandlersEvent$Block(final RegisterColorHandlersEvent.Block event) {
+	protected final void onRegisterColorHandlersEvent$Block(final RegisterColorHandlersEvent.Block event) {
 		blockColorHandlers.get().forEach((k, v) -> event.register((blockState, blockAndTintGetter, blockPos, tintIndex) -> blockAndTintGetter != null && blockPos != null ? k : -1, v));
-		LOGGER.info(SETUP, modMarker + " BLOCK COLOR HANDLERS REGISTERED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " BLOCK COLOR HANDLERS REGISTERED ");
 	}
 
 	@SubscribeEvent
-	public final void onRegisterDimensionSpecialEffectsEvent(final RegisterDimensionSpecialEffectsEvent event) {
+	protected final void onRegisterDimensionSpecialEffectsEvent(final RegisterDimensionSpecialEffectsEvent event) {
 		dimensionSpecialEffects.get().forEach((k, v) -> event.register(k, v));
-		LOGGER.info(SETUP, modMarker + " DIMENSION SPECIAL EFFECTS REGISTERED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " DIMENSION SPECIAL EFFECTS REGISTERED ");
 	}
 
 	@SubscribeEvent
-	public final void onRegisterParticleProvidersEvent(final RegisterParticleProvidersEvent event) {
+	protected final void onRegisterParticleProvidersEvent(final RegisterParticleProvidersEvent event) {
 		particleSprites.get().forEach((k, v) -> event.registerSprite(k, v));
 		particleSpriteSets.get().forEach((k, v) -> event.registerSpriteSet(k, v));
-		LOGGER.info(SETUP, modMarker + " PARTICLE PROVIDERS REGISTERED ");
+		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " PARTICLE PROVIDERS REGISTERED ");
 	}
 
 	@SubscribeEvent
-	public final void onFMLClientSetupEvent(final FMLClientSetupEvent event) {
+	protected final void onFMLClientSetupEvent(final FMLClientSetupEvent event) {
 		event.enqueueWork(() -> {
 			screens.get().forEach((k, v) -> MenuScreens.register(k, v));
-			LOGGER.info(SETUP, modMarker + " SCREENS REGISTERED ");
+			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " SCREENS REGISTERED ");
 			skullTextures.get().forEach((k, v) -> SkullBlockRenderer.SKIN_BY_TYPE.put(k, v));
-			LOGGER.info(SETUP, modMarker + " SKULL TEXTURES REGISTERED ");
+			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " SKULL TEXTURES REGISTERED ");
 			fluidRenderTypes.get().forEach((k, v) -> ItemBlockRenderTypes.setRenderLayer(k, v));
-			LOGGER.info(SETUP, modMarker + " FLUID RENDER TYPES SET ");
+			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " FLUID RENDER TYPES SET ");
 			SortedMap<RenderType, BufferBuilder> fixedBuffers = ObfuscationReflectionHelper.getPrivateValue(RenderBuffers.class, Minecraft.getInstance().renderBuffers(), "f_110093_");
 			renderTypes.get().forEach((k, v) -> fixedBuffers.put(k, v));
-			LOGGER.info(SETUP, modMarker + " RENDER TYPES ADDED ");
+			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " RENDER TYPES ADDED ");
 		});
 	}
 }

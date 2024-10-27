@@ -1,6 +1,6 @@
-package com.tlregen.api.registration;
+package com.tlregen.api.setup;
 
-public class SetupException extends Exception {
+class SetupException extends Exception {
 	@java.io.Serial
 	private static final long serialVersionUID = -4984685859977485579L;
 

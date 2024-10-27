@@ -6,20 +6,17 @@ import java.util.Map.Entry;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import com.tlregen.TLReGen;
 import com.tlregen.util.TextUtil;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -27,14 +24,12 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
 
 /**
- * This class handles Deferred Registration for TLReGen. Create an instance of this class in your mod and reference the instance as needed.
+ * This class handles Deferred Registration. Create an instance of this class in your mod and reference the instance as needed.
  */
 public class MasterDeferredRegistrar {
+	private static final Marker REGISTRATION = MarkerManager.getMarker("REGISTRATION");
 	private String modID;
 	private String modMarker;
-	private IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-	private static final Logger LOGGER = LogManager.getLogger("TLREGEN");
-	private static final Marker REGISTRATION = MarkerManager.getMarker("REGISTRATION");
 	private Map<ResourceKey<? extends Registry<?>>, RegistrationTracker<?>> registries = new HashMap<>();
 	private boolean firstRegistrationEvent = true;
 
@@ -50,8 +45,8 @@ public class MasterDeferredRegistrar {
 	public MasterDeferredRegistrar(String modid) {
 		modID = modid;
 		modMarker = "(" + TextUtil.stringToAllCapsName(modid) + ")";
-		LOGGER.info(REGISTRATION, modMarker + " NEW MASTER DEFERRED REGISTRAR CONSTRUCTED");
-		modBus.register(this);
+		FMLJavaModLoadingContext.get().getModEventBus().register(this);
+		TLReGen.LOGGER.info(REGISTRATION, modMarker + " NEW MASTER DEFERRED REGISTRAR CONSTRUCTED");
 	}
 
 	/**
@@ -74,9 +69,9 @@ public class MasterDeferredRegistrar {
 	 */
 	public <R> DeferredRegister<R> addRegister(ResourceKey<? extends Registry<R>> key, Supplier<RegistryObject<?>> bootstrapRegistryObject) {
 		DeferredRegister<R> deferredRegister = DeferredRegister.create(key, modID);
-		deferredRegister.register(modBus);
+		deferredRegister.register(FMLJavaModLoadingContext.get().getModEventBus());
 		registries.put(key, new RegistrationTracker<R>(deferredRegister, bootstrapRegistryObject, 0));
-		LOGGER.info(REGISTRATION, modMarker + " " + TextUtil.stringToAllCapsName(key.location().toString()) + " DEFERRED REGISTER ADDED");
+		TLReGen.LOGGER.info(REGISTRATION, modMarker + " " + TextUtil.stringToAllCapsName(key.location().toString()) + " DEFERRED REGISTER ADDED");
 		return deferredRegister;
 	}
 
@@ -88,13 +83,13 @@ public class MasterDeferredRegistrar {
 	 */
 	@SubscribeEvent
 	protected final void initDeferredRegisters(final FMLConstructModEvent event) {
-		LOGGER.info(REGISTRATION, modMarker + " INITIALIZATION STARTING");
+		TLReGen.LOGGER.info(REGISTRATION, modMarker + " INITIALIZATION STARTING");
 		registries.forEach((reg, counter) -> {
 			counter.bootstrap.get();
 			counter.initialized = counter.deferredRegister.getEntries().size();
-			LOGGER.info(REGISTRATION, modMarker + " " + TextUtil.stringToAllCapsName(reg.location().toString()) + " INITIALIZED " + counter.initialized);
+			TLReGen.LOGGER.info(REGISTRATION, modMarker + " " + TextUtil.stringToAllCapsName(reg.location().toString()) + " INITIALIZED " + counter.initialized);
 		});
-		LOGGER.info(REGISTRATION, modMarker + " INITIALIZATION COMPLETE");
+		TLReGen.LOGGER.info(REGISTRATION, modMarker + " INITIALIZATION COMPLETE");
 	}
 
 	/**
@@ -106,7 +101,7 @@ public class MasterDeferredRegistrar {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	protected final void validateDeferredRegisters(final RegisterEvent event) {
 		if (firstRegistrationEvent) {
-			LOGGER.info(REGISTRATION, modMarker + " REGISTRATION STARTING");
+			TLReGen.LOGGER.info(REGISTRATION, modMarker + " REGISTRATION STARTING");
 			firstRegistrationEvent = false;
 		}
 		try {
@@ -114,26 +109,19 @@ public class MasterDeferredRegistrar {
 				Stream<Entry<ResourceKey<Object>, Object>> stream = event.getForgeRegistry() != null ? event.getForgeRegistry().getEntries().stream() : event.getVanillaRegistry().entrySet().stream();
 				long initialized = registries.get(event.getRegistryKey()).initialized;
 				long registered = stream.filter((entry) -> entry.getKey().location().getNamespace() == modID).count();
-				LOGGER.info(REGISTRATION, modMarker + " " + TextUtil.stringToAllCapsName(event.getRegistryKey().location().toString()) + " REGISTERED " + registered + " OF " + initialized);
+				TLReGen.LOGGER.info(REGISTRATION, modMarker + " " + TextUtil.stringToAllCapsName(event.getRegistryKey().location().toString()) + " REGISTERED " + registered + " OF " + initialized);
 
 				if (registered < initialized) {
-					LOGGER.error(REGISTRATION, "ERROR - " + TextUtil.stringToAllCapsName(event.getRegistryKey().location().toString()) + " - MISSING " + (initialized - registered));
+					TLReGen.LOGGER.error(REGISTRATION, "ERROR - " + TextUtil.stringToAllCapsName(event.getRegistryKey().location().toString()) + " - MISSING " + (initialized - registered));
 					throw new RegistrationException("REGISTERED ENTRIES LESS THAN INITIALIZED ENTRIES");
 				} else if (registered > initialized) {
-					LOGGER.error(REGISTRATION, "ERROR - " + TextUtil.stringToAllCapsName(event.getRegistryKey().location().toString()) + " - EXTRANEOUS " + (initialized - registered));
+					TLReGen.LOGGER.error(REGISTRATION, "ERROR - " + TextUtil.stringToAllCapsName(event.getRegistryKey().location().toString()) + " - EXTRANEOUS " + (initialized - registered));
 					throw new RegistrationException("REGISTERED ENTRIES GREATER THAN INITIALIZED ENTRIES");
 				}
 			}
 		} catch (RegistrationException e) {
-			// LOGGER.info(REGISTRATION, "UNREGISTERING REGISTEREVENT LISTENER DUE TO ERRORS");
-			// modBus.unregister(this);
-			throw new IllegalStateException("REGISTRATION ERROR", e);
+			throw new IllegalStateException("REGISTRATION EXCEPTION", e);
 		}
-	}
-
-	@SubscribeEvent
-	protected final void onFMLLoadCompleteEvent(final FMLLoadCompleteEvent event) {
-		LOGGER.info(REGISTRATION, "LOAD COMPLETE");
 	}
 
 	private static class RegistrationTracker<R> {
