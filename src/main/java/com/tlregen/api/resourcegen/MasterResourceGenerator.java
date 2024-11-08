@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.tlregen.api.resourcegen.data.tags.TLReGenTagsBlocks;
+import com.tlregen.api.resourcegen.util.TLReGenModels;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
@@ -32,6 +33,7 @@ public class MasterResourceGenerator {
 	protected final DynamicOps<JsonElement> dynamicOps = JsonOps.INSTANCE;
 
 	public static TLReGenTagsBlocks TagBlocks;
+	public TLReGenModels models;
 
 	private Set<Supplier<TLReGenAssetProvider>> assetProviders = Collections.emptySet();
 	private Set<Supplier<DataProvider>> dataProviders = Collections.emptySet();
@@ -39,6 +41,7 @@ public class MasterResourceGenerator {
 	public MasterResourceGenerator(String modid) {
 		modID = modid;
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
+		models = new TLReGenModels();
 	}
 
 	public MasterResourceGenerator() {
@@ -68,11 +71,15 @@ public class MasterResourceGenerator {
 		helper = event.getExistingFileHelper();
 		lookupProvider = event.getLookupProvider();
 
+		models.modID = modID;
+		models.helper = helper;
+
 		assetProviders.forEach((assetProviderSupplier) -> {
 			TLReGenAssetProvider assetProvider = assetProviderSupplier.get();
 			assetProvider.modID = modID;
 			assetProvider.packOutput = packOutput;
 			assetProvider.helper = helper;
+			assetProvider.models = models;
 			generator.addProvider(event.includeClient(), assetProvider);
 		});
 		dataProviders.forEach((dataProviderSupplier) -> {
