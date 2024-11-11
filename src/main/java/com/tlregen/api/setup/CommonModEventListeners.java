@@ -7,12 +7,15 @@ import java.util.function.Supplier;
 
 import com.google.common.collect.Sets;
 import com.tlregen.TLReGen;
+import com.tlregen.api.setup.util.TLReGenSpawnPlacements;
 import com.tlregen.util.TextUtil;
 import com.tlregen.util.ValidationLevel;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.SpawnPlacements.SpawnPredicate;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.npc.Villager;
@@ -23,6 +26,7 @@ import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -39,6 +43,7 @@ class CommonModEventListeners {
 	Supplier<Map<Item, Float>> compostables;
 	Supplier<Map<Block, Block>> plants;
 	Supplier<Set<Item>> wantedItems;
+	Supplier<Map<EntityType<? extends Entity>, TLReGenSpawnPlacements.Data>> spawnPlacements;
 
 	CommonModEventListeners(String modID) {
 		this.modID = modID;
@@ -102,5 +107,10 @@ class CommonModEventListeners {
 			int after3 = Villager.WANTED_ITEMS.size();
 			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " WANTED ITEMS ADDED TO VILLAGER ENTITY " + (after3 - before3));
 		});
+	}
+
+	@SubscribeEvent
+	protected final <T extends Entity> void onSpawnPlacementRegisterEvent(final SpawnPlacementRegisterEvent event) {
+		spawnPlacements.get().forEach((k, v) -> event.register((EntityType<T>) k, v.placement, v.heightMap, (SpawnPredicate<T>) v.predicate, v.operation));
 	}
 }

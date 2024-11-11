@@ -12,6 +12,7 @@ import org.apache.logging.log4j.MarkerManager;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.tlregen.TLReGen;
+import com.tlregen.api.setup.util.TLReGenSpawnPlacements.Data;
 import com.tlregen.util.TextUtil;
 import com.tlregen.util.ValidationLevel;
 
@@ -97,6 +98,10 @@ public class MasterSetupExecutor {
 
 	public void addCapabilities(List<Class<?>> capabilities) {
 		commonModEventListeners.capabilities = capabilities;
+	}
+
+	public void registerSpawnPlacements(Supplier<Map<EntityType<? extends Entity>, Data>> spawnPlacements) {
+		commonModEventListeners.spawnPlacements = spawnPlacements;
 	}
 
 	public void addCommands(Supplier<List<LiteralArgumentBuilder<CommandSourceStack>>> commands) {
@@ -204,4 +209,5 @@ public class MasterSetupExecutor {
 			clientModEventListeners.renderTypes = renderTypes;
 		}
 	}
+
 }
