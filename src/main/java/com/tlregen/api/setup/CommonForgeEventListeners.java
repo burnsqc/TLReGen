@@ -64,9 +64,13 @@ class CommonForgeEventListeners {
 	protected final void onVillagerTradesEvent(final VillagerTradesEvent event) {
 		int before = event.getTrades().size();
 		if (event.getType() == VillagerProfession.BUTCHER) {
-			butcherTrades.get().forEach((trade) -> event.getTrades().get(5).add(trade));
+			if (butcherTrades != null) {
+				butcherTrades.get().forEach((trade) -> event.getTrades().get(5).add(trade));
+			}
 		} else if (event.getType() == VillagerProfession.FARMER) {
-			farmerTrades.get().forEach((trade) -> event.getTrades().get(1).add(trade));
+			if (farmerTrades != null) {
+				farmerTrades.get().forEach((trade) -> event.getTrades().get(1).add(trade));
+			}
 		}
 		int after = event.getTrades().size();
 		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " TRADES ADDED TO VILLAGER TRADES " + (after - before));
@@ -74,9 +78,11 @@ class CommonForgeEventListeners {
 
 	@SubscribeEvent
 	protected final void onWandererTradesEvent(final WandererTradesEvent event) {
-		int before = event.getGenericTrades().size();
-		genericTrades.get().forEach((trade) -> event.getGenericTrades().add(trade));
-		int after = event.getGenericTrades().size();
-		TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " GENERIC TRADES ADDED TO WANDERING TRADER TRADES " + (after - before));
+		if (genericTrades != null) {
+			int before = event.getGenericTrades().size();
+			genericTrades.get().forEach((trade) -> event.getGenericTrades().add(trade));
+			int after = event.getGenericTrades().size();
+			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " GENERIC TRADES ADDED TO WANDERING TRADER TRADES " + (after - before));
+		}
 	}
 }

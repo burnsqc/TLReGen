@@ -92,25 +92,32 @@ class CommonModEventListeners {
 	@SubscribeEvent
 	protected final void onFMLCommonSetupEvent(final FMLCommonSetupEvent event) {
 		event.enqueueWork(() -> {
-			int before = ComposterBlock.COMPOSTABLES.size();
-			compostables.get().forEach((k, v) -> ComposterBlock.COMPOSTABLES.put(() -> k.asItem(), v));
-			int after = ComposterBlock.COMPOSTABLES.size();
-			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " COMPOSTABLES ADDED TO COMPOSTER BLOCK " + (after - before));
-
-			int before2 = ((FlowerPotBlock) Blocks.FLOWER_POT).getFullPotsView().size();
-			plants.get().forEach((k, v) -> ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ForgeRegistries.BLOCKS.getKey(k), () -> v));
-			int after2 = ((FlowerPotBlock) Blocks.FLOWER_POT).getFullPotsView().size();
-			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " PLANTS ADDED TO FLOWER POT BLOCK " + (after2 - before2));
-
-			int before3 = Villager.WANTED_ITEMS.size();
-			Villager.WANTED_ITEMS = Sets.union(Villager.WANTED_ITEMS, wantedItems.get());
-			int after3 = Villager.WANTED_ITEMS.size();
-			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " WANTED ITEMS ADDED TO VILLAGER ENTITY " + (after3 - before3));
+			if (compostables != null) {
+				int before = ComposterBlock.COMPOSTABLES.size();
+				compostables.get().forEach((k, v) -> ComposterBlock.COMPOSTABLES.put(() -> k.asItem(), v));
+				int after = ComposterBlock.COMPOSTABLES.size();
+				TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " COMPOSTABLES ADDED TO COMPOSTER BLOCK " + (after - before));
+			}
+			if (plants != null) {
+				int before2 = ((FlowerPotBlock) Blocks.FLOWER_POT).getFullPotsView().size();
+				plants.get().forEach((k, v) -> ((FlowerPotBlock) Blocks.FLOWER_POT).addPlant(ForgeRegistries.BLOCKS.getKey(k), () -> v));
+				int after2 = ((FlowerPotBlock) Blocks.FLOWER_POT).getFullPotsView().size();
+				TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " PLANTS ADDED TO FLOWER POT BLOCK " + (after2 - before2));
+			}
+			if (wantedItems != null) {
+				int before3 = Villager.WANTED_ITEMS.size();
+				Villager.WANTED_ITEMS = Sets.union(Villager.WANTED_ITEMS, wantedItems.get());
+				int after3 = Villager.WANTED_ITEMS.size();
+				TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " WANTED ITEMS ADDED TO VILLAGER ENTITY " + (after3 - before3));
+			}
 		});
 	}
 
+	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	protected final <T extends Entity> void onSpawnPlacementRegisterEvent(final SpawnPlacementRegisterEvent event) {
-		spawnPlacements.get().forEach((k, v) -> event.register((EntityType<T>) k, v.placement, v.heightMap, (SpawnPredicate<T>) v.predicate, v.operation));
+		if (spawnPlacements != null) {
+			spawnPlacements.get().forEach((k, v) -> event.register((EntityType<T>) k, v.placement, v.heightMap, (SpawnPredicate<T>) v.predicate, v.operation));
+		}
 	}
 }

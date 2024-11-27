@@ -5,7 +5,7 @@ license="All Rights Reserved"
 
 [[mods]]
 	modId="tlregen"
-	version="0.0.1"
+	version="0.1.0"
 	displayName="TLReGen"
 	credits="burnsqc"
 	authors="burnsqc"

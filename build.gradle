@@ -6,7 +6,7 @@ plugins {
     //id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-version = '0.0.1'
+version = '0.1.0'
 group = 'com.tlregen'
 
 base {
@@ -88,7 +88,7 @@ tasks.named('jar', Jar).configure {
         ])
     }
 
-    //finalizedBy 'reobfJar'
+    // finalizedBy 'reobfJar'
 }
 
 artifacts {
