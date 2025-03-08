@@ -43,6 +43,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 /**
@@ -210,4 +211,7 @@ public class MasterSetupExecutor {
 		}
 	}
 
+	public void addConditionSerializers(Supplier<Set<IConditionSerializer<?>>> conditionSerializers) {
+		commonModEventListeners.conditionSerializers = conditionSerializers;
+	}
 }

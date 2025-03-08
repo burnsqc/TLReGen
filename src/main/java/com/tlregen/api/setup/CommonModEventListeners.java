@@ -25,12 +25,15 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 
 class CommonModEventListeners {
 	private String modID;
@@ -44,6 +47,7 @@ class CommonModEventListeners {
 	Supplier<Map<Block, Block>> plants;
 	Supplier<Set<Item>> wantedItems;
 	Supplier<Map<EntityType<? extends Entity>, TLReGenSpawnPlacements.Data>> spawnPlacements;
+	Supplier<Set<IConditionSerializer<?>>> conditionSerializers;
 
 	CommonModEventListeners(String modID) {
 		this.modID = modID;
@@ -118,6 +122,15 @@ class CommonModEventListeners {
 	protected final <T extends Entity> void onSpawnPlacementRegisterEvent(final SpawnPlacementRegisterEvent event) {
 		if (spawnPlacements != null) {
 			spawnPlacements.get().forEach((k, v) -> event.register((EntityType<T>) k, v.placement, v.heightMap, (SpawnPredicate<T>) v.predicate, v.operation));
+		}
+	}
+
+	@SubscribeEvent
+	protected final void onRegisterEvent(final RegisterEvent event) {
+		if (event.getRegistryKey().equals(ForgeRegistries.Keys.RECIPE_SERIALIZERS) && conditionSerializers != null) {
+			int required = conditionSerializers.get().size();
+			conditionSerializers.get().forEach((conditionSerializer) -> CraftingHelper.register(conditionSerializer));
+			TLReGen.LOGGER.info(MasterSetupExecutor.SETUP, modMarker + " CONDITION SERIALIZERS REGISTERED " + required);
 		}
 	}
 }
