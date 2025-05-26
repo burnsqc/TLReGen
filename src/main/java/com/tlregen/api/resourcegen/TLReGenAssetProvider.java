@@ -19,7 +19,7 @@ public abstract class TLReGenAssetProvider implements DataProvider {
 
 	@Override
 	public String getName() {
-		return target.toString() + modID;
+		return "assets" + modID;
 	}
 
 	protected abstract void populate();

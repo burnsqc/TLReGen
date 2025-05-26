@@ -17,7 +17,7 @@ public abstract class TLReGenDataProvider implements DataProvider {
 
 	@Override
 	public String getName() {
-		return target.toString() + modID;
+		return "data" + modID;
 	}
 
 	protected abstract void populate();

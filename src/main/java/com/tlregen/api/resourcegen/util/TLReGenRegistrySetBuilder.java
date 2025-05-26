@@ -29,15 +29,6 @@ import net.minecraft.tags.TagKey;
 public class TLReGenRegistrySetBuilder {
 	private final List<TLReGenRegistrySetBuilder.RegistryStub<?>> entries = new ArrayList<>();
 
-	static <T> HolderGetter<T> wrapContextLookup(final HolderLookup.RegistryLookup<T> p_255625_) {
-		return new TLReGenRegistrySetBuilder.EmptyTagLookup<T>(p_255625_) {
-			@Override
-			public Optional<Holder.Reference<T>> get(ResourceKey<T> p_255765_) {
-				return p_255625_.get(p_255765_);
-			}
-		};
-	}
-
 	public <T> TLReGenRegistrySetBuilder add(ResourceKey<? extends Registry<T>> registry, TLReGenRegistrySetBuilder.RegistryBootstrap<T> bootstrap) {
 		this.entries.add(new TLReGenRegistrySetBuilder.RegistryStub<>(registry, Lifecycle.stable(), bootstrap));
 		return this;
@@ -53,20 +44,6 @@ public class TLReGenRegistrySetBuilder {
 			p_255629_.apply(registrysetbuilder$buildstate);
 		});
 		return registrysetbuilder$buildstate;
-	}
-
-	public HolderLookup.Provider build(RegistryAccess p_256112_) {
-		TLReGenRegistrySetBuilder.BuildState registrysetbuilder$buildstate = this.createState(p_256112_);
-		Stream<HolderLookup.RegistryLookup<?>> stream = p_256112_.registries().map((p_258195_) -> {
-			return p_258195_.value().asLookup();
-		});
-		Stream<HolderLookup.RegistryLookup<?>> stream1 = this.entries.stream().map((p_255700_) -> {
-			return p_255700_.collectChanges(registrysetbuilder$buildstate).buildAsLookup();
-		});
-		HolderLookup.Provider holderlookup$provider = HolderLookup.Provider.create(Stream.concat(stream, stream1.peek(registrysetbuilder$buildstate::addOwner)));
-		registrysetbuilder$buildstate.reportRemainingUnreferencedValues();
-		registrysetbuilder$buildstate.throwOnError();
-		return holderlookup$provider;
 	}
 
 	public HolderLookup.Provider buildPatch(RegistryAccess registryAccess, HolderLookup.Provider provider) {
@@ -127,16 +104,6 @@ public class TLReGenRegistrySetBuilder {
 					return Optional.ofNullable((HolderLookup.RegistryLookup<S>) BuildState.this.registries.get(registry.location()));
 				}
 			};
-		}
-
-		public void reportRemainingUnreferencedValues() {
-			for (ResourceKey<Object> resourcekey : this.lookup.holders.keySet()) {
-				this.errors.add(new IllegalStateException("Unreferenced key: " + resourcekey));
-			}
-
-			this.registeredValues.forEach((p_256143_, p_256662_) -> {
-				this.errors.add(new IllegalStateException("Orpaned value " + p_256662_.value + " for key " + p_256143_));
-			});
 		}
 
 		public void throwOnError() {

@@ -84,6 +84,12 @@ public class MasterResourceGenerator {
 		});
 		dataProviders.forEach((dataProviderSupplier) -> {
 			DataProvider dataProvider = dataProviderSupplier.get();
+			if (dataProvider instanceof TLReGenDataProvider) {
+				TLReGenDataProvider assetProvider = (TLReGenDataProvider) dataProvider;
+				assetProvider.modID = modID;
+				assetProvider.packOutput = packOutput;
+				assetProvider.helper = helper;
+			}
 			generator.addProvider(event.includeServer(), dataProvider);
 			if (dataProvider instanceof TLReGenTagsBlocks) {
 				TagBlocks = (TLReGenTagsBlocks) dataProvider;
