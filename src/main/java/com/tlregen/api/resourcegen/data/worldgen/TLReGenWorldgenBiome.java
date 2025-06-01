@@ -26,21 +26,18 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 
-public class TLReGenWorldgenBiome extends MasterResourceGenerator implements DataProvider {
-	private final CompletableFuture<HolderLookup.Provider> completables = lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.BIOME, TLReGenWorldgenBiome::bootstrap)));
+public class TLReGenWorldgenBiome<R> extends MasterResourceGenerator implements DataProvider {
+	private final CompletableFuture<HolderLookup.Provider> completables = lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.BIOME, s -> bootstrap((BootstapContext<R>) s))));
 	private final java.util.function.Predicate<String> namespacePredicate = Set.of(modID) == null ? namespace -> true : Set.of(modID)::contains;
-	public static BootstapContext<Biome> bootstrapContext;
-	public static DynamicRegister<Biome> dynamicRegister;
+	public DynamicRegister<R> dynamicRegister;
 
-	public TLReGenWorldgenBiome(DynamicRegister<Biome> dynReg) {
+	public TLReGenWorldgenBiome(DynamicRegister<R> dynReg) {
 		dynamicRegister = dynReg;
 	}
 
-	public static void bootstrap(final BootstapContext<Biome> bootstrapContext) {
-		TLReGenWorldgenBiome.setBootstrapContext(bootstrapContext);
+	public void bootstrap(final BootstapContext<R> bootstrapContext) {
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
 	}
 
@@ -85,9 +82,5 @@ public class TLReGenWorldgenBiome extends MasterResourceGenerator implements Dat
 		DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().filter(data -> !builderKeys.contains(data.key())).forEach(data -> datapackEntriesBuilder.add(data.key(), context -> {
 		}));
 		return datapackEntriesBuilder.buildPatch(RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), original);
-	}
-
-	protected static void setBootstrapContext(BootstapContext<Biome> bootstrapContextIn) {
-		bootstrapContext = bootstrapContextIn;
 	}
 }
