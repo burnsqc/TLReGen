@@ -98,7 +98,7 @@ public class MasterDeferredRegistrar {
 	 * 
 	 * @param event The RegisterEvent that will be intercepted.
 	 */
-	@SubscribeEvent(priority = EventPriority.LOW)
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	protected final void validateDeferredRegisters(final RegisterEvent event) {
 		if (firstRegistrationEvent) {
 			TLReGen.LOGGER.info(REGISTRATION, modMarker + " REGISTRATION STARTING");
@@ -123,7 +123,7 @@ public class MasterDeferredRegistrar {
 			throw new IllegalStateException("REGISTRATION EXCEPTION", e);
 		}
 	}
-	
+
 	private static class RegistrationTracker<R> {
 		DeferredRegister<R> deferredRegister;
 		Supplier<RegistryObject<?>> bootstrap;

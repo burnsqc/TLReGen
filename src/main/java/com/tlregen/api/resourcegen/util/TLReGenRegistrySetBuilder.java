@@ -25,24 +25,23 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.ForgeHooks;
 
 public class TLReGenRegistrySetBuilder {
-	private final List<TLReGenRegistrySetBuilder.RegistryStub<?>> registryStubs = new ArrayList<>();
+	private final List<TLReGenRegistrySetBuilder.RegistryStub<?>> entries = new ArrayList<>();
 
-	public <R> TLReGenRegistrySetBuilder add(ResourceKey<? extends Registry<R>> registry, TLReGenRegistrySetBuilder.RegistryBootstrap<R> bootstrap) {
-		this.registryStubs.add(new TLReGenRegistrySetBuilder.RegistryStub<>(registry, Lifecycle.stable(), bootstrap));
+	public <T> TLReGenRegistrySetBuilder add(ResourceKey<? extends Registry<T>> registry, TLReGenRegistrySetBuilder.RegistryBootstrap<T> bootstrap) {
+		this.entries.add(new TLReGenRegistrySetBuilder.RegistryStub<>(registry, Lifecycle.stable(), bootstrap));
 		return this;
 	}
 
 	public List<? extends ResourceKey<? extends Registry<?>>> getEntryKeys() {
-		return this.registryStubs.stream().map(TLReGenRegistrySetBuilder.RegistryStub::key).toList();
+		return this.entries.stream().map(TLReGenRegistrySetBuilder.RegistryStub::key).toList();
 	}
 
-	private TLReGenRegistrySetBuilder.BuildState createState(RegistryAccess registryAccess) {
-		TLReGenRegistrySetBuilder.BuildState registrysetbuilder$buildstate = TLReGenRegistrySetBuilder.BuildState.create(registryAccess, this.registryStubs.stream().map(TLReGenRegistrySetBuilder.RegistryStub::key));
-		this.registryStubs.forEach((registryStub) -> {
-			registryStub.apply(registrysetbuilder$buildstate);
+	private TLReGenRegistrySetBuilder.BuildState createState(RegistryAccess p_256400_) {
+		TLReGenRegistrySetBuilder.BuildState registrysetbuilder$buildstate = TLReGenRegistrySetBuilder.BuildState.create(p_256400_, this.entries.stream().map(TLReGenRegistrySetBuilder.RegistryStub::key));
+		this.entries.forEach((p_255629_) -> {
+			p_255629_.apply(registrysetbuilder$buildstate);
 		});
 		return registrysetbuilder$buildstate;
 	}
@@ -50,11 +49,11 @@ public class TLReGenRegistrySetBuilder {
 	public HolderLookup.Provider buildPatch(RegistryAccess registryAccess, HolderLookup.Provider provider) {
 		TLReGenRegistrySetBuilder.BuildState registrysetbuilder$buildstate = this.createState(registryAccess);
 		Map<ResourceKey<? extends Registry<?>>, TLReGenRegistrySetBuilder.RegistryContents<?>> map = new HashMap<>();
-		registrysetbuilder$buildstate.collectReferencedRegistries().forEach((registryContents) -> {
-			map.put(registryContents.key, registryContents);
+		registrysetbuilder$buildstate.collectReferencedRegistries().forEach((p_272339_) -> {
+			map.put(p_272339_.key, p_272339_);
 		});
-		this.registryStubs.stream().map((registryStub) -> {
-			return registryStub.collectChanges(registrysetbuilder$buildstate);
+		this.entries.stream().map((p_272337_) -> {
+			return p_272337_.collectChanges(registrysetbuilder$buildstate);
 		}).forEach((p_272341_) -> {
 			map.put(p_272341_.key, p_272341_);
 		});
@@ -63,35 +62,41 @@ public class TLReGenRegistrySetBuilder {
 		});
 		HolderLookup.Provider holderlookup$provider = HolderLookup.Provider.create(Stream.concat(stream, map.values().stream().map(TLReGenRegistrySetBuilder.RegistryContents::buildAsLookup).peek(registrysetbuilder$buildstate::addOwner)));
 		registrysetbuilder$buildstate.fillMissingHolders(provider);
+		// registrysetbuilder$buildstate.reportRemainingUnreferencedValues();
+		registrysetbuilder$buildstate.throwOnError();
 		return holderlookup$provider;
 	}
 
-	public static record BuildState(TLReGenRegistrySetBuilder.CompositeOwner compositeOwner, TLReGenRegistrySetBuilder.UniversalLookup universalLookup, Map<ResourceLocation, HolderGetter<?>> registries, Map<ResourceKey<?>, TLReGenRegistrySetBuilder.RegisteredValue<?>> registeredValues, List<RuntimeException> errors) {
-		public static TLReGenRegistrySetBuilder.BuildState create(RegistryAccess registryAccess, Stream<ResourceKey<? extends Registry<?>>> registries) {
-			TLReGenRegistrySetBuilder.CompositeOwner compositeOwner = new TLReGenRegistrySetBuilder.CompositeOwner();
-			TLReGenRegistrySetBuilder.UniversalLookup universalLookup = new TLReGenRegistrySetBuilder.UniversalLookup(compositeOwner);
+	public static record BuildState(TLReGenRegistrySetBuilder.CompositeOwner owner, TLReGenRegistrySetBuilder.UniversalLookup lookup, Map<ResourceLocation, HolderGetter<?>> registries, Map<ResourceKey<?>, TLReGenRegistrySetBuilder.RegisteredValue<?>> registeredValues, List<RuntimeException> errors) {
+		public static TLReGenRegistrySetBuilder.BuildState create(RegistryAccess p_255995_, Stream<ResourceKey<? extends Registry<?>>> p_256495_) {
+			TLReGenRegistrySetBuilder.CompositeOwner registrysetbuilder$compositeowner = new TLReGenRegistrySetBuilder.CompositeOwner();
+			List<RuntimeException> list = new ArrayList<>();
+			TLReGenRegistrySetBuilder.UniversalLookup registrysetbuilder$universallookup = new TLReGenRegistrySetBuilder.UniversalLookup(registrysetbuilder$compositeowner);
 			ImmutableMap.Builder<ResourceLocation, HolderGetter<?>> builder = ImmutableMap.builder();
-			registryAccess.registries().forEach((registryEntry) -> {
-				builder.put(registryEntry.key().location(), ForgeHooks.wrapRegistryLookup(registryEntry.value().asLookup()));
+			p_255995_.registries().forEach((p_258197_) -> {
+				builder.put(p_258197_.key().location(), net.minecraftforge.common.ForgeHooks.wrapRegistryLookup(p_258197_.value().asLookup()));
 			});
-			registries.forEach((resourceKey) -> {
-				builder.put(resourceKey.location(), universalLookup);
+			p_256495_.forEach((p_256603_) -> {
+				builder.put(p_256603_.location(), registrysetbuilder$universallookup);
 			});
-			Map<ResourceKey<?>, TLReGenRegistrySetBuilder.RegisteredValue<?>> registeredValues = new HashMap<>();
-			List<RuntimeException> errors = new ArrayList<>();
-			return new TLReGenRegistrySetBuilder.BuildState(compositeOwner, universalLookup, builder.build(), registeredValues, errors);
+			return new TLReGenRegistrySetBuilder.BuildState(registrysetbuilder$compositeowner, registrysetbuilder$universallookup, builder.build(), new HashMap<>(), list);
 		}
 
 		public <T> BootstapContext<T> bootstapContext() {
 			return new BootstapContext<T>() {
 				@Override
-				public Holder.Reference<T> register(ResourceKey<T> resourceKey, T p_256422_, Lifecycle p_255924_) {
-					return BuildState.this.universalLookup.getOrCreate(resourceKey);
+				public Holder.Reference<T> register(ResourceKey<T> p_256176_, T p_256422_, Lifecycle p_255924_) {
+					TLReGenRegistrySetBuilder.RegisteredValue<?> registeredvalue = BuildState.this.registeredValues.put(p_256176_, new TLReGenRegistrySetBuilder.RegisteredValue(p_256422_, p_255924_));
+					if (registeredvalue != null) {
+						BuildState.this.errors.add(new IllegalStateException("Duplicate registration for " + p_256176_ + ", new=" + p_256422_ + ", old=" + registeredvalue.value));
+					}
+
+					return BuildState.this.lookup.getOrCreate(p_256176_);
 				}
 
 				@Override
-				public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> resourceKey) {
-					return (HolderGetter<S>) BuildState.this.registries.getOrDefault(resourceKey.location(), BuildState.this.universalLookup);
+				public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> p_255961_) {
+					return (HolderGetter<S>) BuildState.this.registries.getOrDefault(p_255961_.location(), BuildState.this.lookup);
 				}
 
 				@Override
@@ -101,13 +106,25 @@ public class TLReGenRegistrySetBuilder {
 			};
 		}
 
-		public void addOwner(HolderOwner<?> holderOwner) {
-			this.compositeOwner.add(holderOwner);
+		public void throwOnError() {
+			if (!this.errors.isEmpty()) {
+				IllegalStateException illegalstateexception = new IllegalStateException("Errors during registry creation");
+
+				for (RuntimeException runtimeexception : this.errors) {
+					illegalstateexception.addSuppressed(runtimeexception);
+				}
+
+				throw illegalstateexception;
+			}
+		}
+
+		public void addOwner(HolderOwner<?> p_256407_) {
+			this.owner.add(p_256407_);
 		}
 
 		public void fillMissingHolders(HolderLookup.Provider provider) {
 			Map<ResourceLocation, Optional<? extends HolderLookup<Object>>> map = new HashMap<>();
-			Iterator<Map.Entry<ResourceKey<Object>, Holder.Reference<Object>>> iterator = this.universalLookup.holders.entrySet().iterator();
+			Iterator<Map.Entry<ResourceKey<Object>, Holder.Reference<Object>>> iterator = this.lookup.holders.entrySet().iterator();
 
 			while (iterator.hasNext()) {
 				Map.Entry<ResourceKey<Object>, Holder.Reference<Object>> entry = iterator.next();
@@ -126,7 +143,7 @@ public class TLReGenRegistrySetBuilder {
 		}
 
 		public Stream<TLReGenRegistrySetBuilder.RegistryContents<?>> collectReferencedRegistries() {
-			return this.universalLookup.holders.keySet().stream().map(ResourceKey::registry).distinct().map((p_272342_) -> {
+			return this.lookup.holders.keySet().stream().map(ResourceKey::registry).distinct().map((p_272342_) -> {
 				return new TLReGenRegistrySetBuilder.RegistryContents(ResourceKey.createRegistryKey(p_272342_), Lifecycle.stable(), Map.of());
 			});
 		}
@@ -136,12 +153,12 @@ public class TLReGenRegistrySetBuilder {
 		private final Set<HolderOwner<?>> owners = Sets.newIdentityHashSet();
 
 		@Override
-		public boolean canSerializeIn(HolderOwner<Object> holderOwner) {
-			return this.owners.contains(holderOwner);
+		public boolean canSerializeIn(HolderOwner<Object> p_256333_) {
+			return this.owners.contains(p_256333_);
 		}
 
-		public void add(HolderOwner<?> holderOwner) {
-			this.owners.add(holderOwner);
+		public void add(HolderOwner<?> p_256361_) {
+			this.owners.add(p_256361_);
 		}
 	}
 
@@ -212,20 +229,20 @@ public class TLReGenRegistrySetBuilder {
 	}
 
 	static record RegistryStub<T>(ResourceKey<? extends Registry<T>> key, Lifecycle lifecycle, TLReGenRegistrySetBuilder.RegistryBootstrap<T> bootstrap) {
-		void apply(TLReGenRegistrySetBuilder.BuildState buildState) {
-			this.bootstrap.run(buildState.bootstapContext());
+		void apply(TLReGenRegistrySetBuilder.BuildState p_256272_) {
+			this.bootstrap.run(p_256272_.bootstapContext());
 		}
 
-		public TLReGenRegistrySetBuilder.RegistryContents<T> collectChanges(TLReGenRegistrySetBuilder.BuildState buildState) {
+		public TLReGenRegistrySetBuilder.RegistryContents<T> collectChanges(TLReGenRegistrySetBuilder.BuildState p_256416_) {
 			Map<ResourceKey<T>, TLReGenRegistrySetBuilder.ValueAndHolder<T>> map = new HashMap<>();
-			Iterator<Map.Entry<ResourceKey<?>, TLReGenRegistrySetBuilder.RegisteredValue<?>>> iterator = buildState.registeredValues.entrySet().iterator();
+			Iterator<Map.Entry<ResourceKey<?>, TLReGenRegistrySetBuilder.RegisteredValue<?>>> iterator = p_256416_.registeredValues.entrySet().iterator();
 
 			while (iterator.hasNext()) {
 				Map.Entry<ResourceKey<?>, TLReGenRegistrySetBuilder.RegisteredValue<?>> entry = iterator.next();
 				ResourceKey<?> resourcekey = entry.getKey();
 				if (resourcekey.isFor(this.key)) {
 					TLReGenRegistrySetBuilder.RegisteredValue<T> registeredvalue = (TLReGenRegistrySetBuilder.RegisteredValue<T>) entry.getValue();
-					Holder.Reference<T> reference = (Holder.Reference<T>) buildState.universalLookup.holders.remove(resourcekey);
+					Holder.Reference<T> reference = (Holder.Reference<T>) p_256416_.lookup.holders.remove(resourcekey);
 					map.put((ResourceKey<T>) resourcekey, new TLReGenRegistrySetBuilder.ValueAndHolder<>(registeredvalue, Optional.ofNullable(reference)));
 					iterator.remove();
 				}
@@ -238,17 +255,17 @@ public class TLReGenRegistrySetBuilder {
 	public static class UniversalLookup extends TLReGenRegistrySetBuilder.EmptyTagLookup<Object> {
 		final Map<ResourceKey<Object>, Holder.Reference<Object>> holders = new HashMap<>();
 
-		public UniversalLookup(HolderOwner<Object> holderOwner) {
-			super(holderOwner);
+		public UniversalLookup(HolderOwner<Object> p_256629_) {
+			super(p_256629_);
 		}
 
 		@Override
-		public Optional<Holder.Reference<Object>> get(ResourceKey<Object> resourceKey) {
-			return Optional.of(this.getOrCreate(resourceKey));
+		public Optional<Holder.Reference<Object>> get(ResourceKey<Object> p_256303_) {
+			return Optional.of(this.getOrCreate(p_256303_));
 		}
 
-		public <T> Holder.Reference<T> getOrCreate(ResourceKey<T> resourceKey) {
-			return (Holder.Reference<T>) this.holders.computeIfAbsent((ResourceKey<Object>) resourceKey, (p_256154_) -> {
+		public <T> Holder.Reference<T> getOrCreate(ResourceKey<T> p_256298_) {
+			return (Holder.Reference<T>) this.holders.computeIfAbsent((ResourceKey<Object>) p_256298_, (p_256154_) -> {
 				return Holder.Reference.createStandAlone(this.owner, p_256154_);
 			});
 		}
