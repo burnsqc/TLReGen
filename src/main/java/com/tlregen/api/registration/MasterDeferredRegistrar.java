@@ -27,7 +27,7 @@ import net.minecraftforge.registries.RegistryObject;
  * This class handles Deferred Registration. Create an instance of this class in your mod and reference the instance as needed.
  */
 public class MasterDeferredRegistrar {
-	private static final Marker REGISTRATION = MarkerManager.getMarker("REGISTRATION");
+	private static final Marker REGISTRATION = MarkerManager.getMarker("REGISTRATION-DEFERRED");
 	private String modID;
 	private String modMarker;
 	private Map<ResourceKey<? extends Registry<?>>, RegistrationTracker<?>> registries = new HashMap<>();
