@@ -31,7 +31,7 @@ public class TLReGenDimensionType extends TLReGenDataProvider {
 
 	@Override
 	public final String getName() {
-		return "data." + modID + ".dimension_type";
+		return super.getName() + ".dimension_type";
 	}
 
 	@Override

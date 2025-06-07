@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 
 import com.google.gson.JsonObject;
 import com.tlregen.api.resourcegen.TLReGenAssetProvider;
@@ -21,13 +20,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.ModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.ExistingFileHelper.ResourceType;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class TLReGenModelsItem extends TLReGenAssetProvider {
 	private final Map<ResourceLocation, ItemModelBuilder> resources = new HashMap<>();
-	private BiFunction<ResourceLocation, ExistingFileHelper, ItemModelBuilder> bifunc = ItemModelBuilder::new;
 
 	@Override
 	public final CompletableFuture<?> run(final CachedOutput cache) {
@@ -57,7 +54,9 @@ public abstract class TLReGenModelsItem extends TLReGenAssetProvider {
 	private ItemModelBuilder getBuilder(String path) {
 		ResourceLocation outputLoc = extendWithFolder(path.contains(":") ? new ResourceLocation(path) : new ResourceLocation(modID, path));
 		helper.trackGenerated(outputLoc, new ResourceType(PackType.CLIENT_RESOURCES, ".json", "models"));
-		return resources.computeIfAbsent(outputLoc, loc -> bifunc.apply(loc, helper));
+		ItemModelBuilder itemModelBuilder = new ItemModelBuilder(outputLoc, helper);
+		resources.put(outputLoc, itemModelBuilder);
+		return itemModelBuilder;
 	}
 
 	private ResourceLocation extendWithFolder(ResourceLocation rl) {

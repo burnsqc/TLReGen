@@ -9,7 +9,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ObjectArrays;
 import com.google.gson.JsonObject;
-import com.tlregen.api.resourcegen.assets.TLReGenBlockstates;
 
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -69,14 +68,6 @@ public final class TLReGenConfiguredModel {
 
 	static Builder<TLReGenVariantBlockStateBuilder> builder(TLReGenVariantBlockStateBuilder outer, TLReGenVariantBlockStateBuilder.PartialBlockstate state) {
 		return new Builder<>(models -> outer.setModels(state, models), ImmutableList.of());
-	}
-
-	static Builder<TLReGenMultiPartBlockStateBuilder.PartBuilder> builder(TLReGenMultiPartBlockStateBuilder outer) {
-		return new Builder<TLReGenMultiPartBlockStateBuilder.PartBuilder>(models -> {
-			TLReGenMultiPartBlockStateBuilder.PartBuilder ret = outer.new PartBuilder(new TLReGenBlockstates.ConfiguredModelList(models));
-			outer.addPart(ret);
-			return ret;
-		}, ImmutableList.of());
 	}
 
 	public static class Builder<T> {

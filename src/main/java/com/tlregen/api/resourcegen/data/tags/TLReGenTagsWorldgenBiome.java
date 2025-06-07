@@ -3,14 +3,9 @@ package com.tlregen.api.resourcegen.data.tags;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
@@ -67,23 +62,16 @@ public abstract class TLReGenTagsWorldgenBiome extends MasterResourceGenerator i
 			return new CombinedData<>(provider, tagLookup);
 		}).thenCompose((combinedData) -> {
 			HolderLookup.RegistryLookup<Biome> registrylookup = combinedData.contents.lookup(registryKey).get();
-			Predicate<ResourceLocation> predicate = (resourceLocation) -> registrylookup.get(ResourceKey.create(registryKey, resourceLocation)).isPresent();
-			Predicate<ResourceLocation> predicate1 = (resourceLocation) -> blockTags.containsKey(resourceLocation) || combinedData.parent.contains(TagKey.create(registryKey, resourceLocation));
 
 			return CompletableFuture.allOf(blockTags.entrySet().stream().map((p_255499_) -> {
 				ResourceLocation resourcelocation = p_255499_.getKey();
 				TagBuilder tagbuilder = p_255499_.getValue();
 				List<TagEntry> list = tagbuilder.build();
-				List<TagEntry> list1 = Stream.concat(list.stream(), tagbuilder.getRemoveEntries()).filter((p_274771_) -> {
-					return !p_274771_.verifyIfPresent(predicate, predicate1);
-				}).filter(this::missing).toList();
-				if (!list1.isEmpty()) {
-					throw new IllegalArgumentException(String.format(Locale.ROOT, "Couldn't define tag %s as it is missing following references: %s", resourcelocation, list1.stream().map(Objects::toString).collect(Collectors.joining(","))));
-				} else {
-					var removed = tagbuilder.getRemoveEntries().toList();
-					JsonObject json = TagFile.CODEC.encodeStart(JsonOps.INSTANCE, new TagFile(list, tagbuilder.isReplace(), removed)).getOrThrow(false, LOGGER::error).getAsJsonObject();
-					return DataProvider.saveStable(cache, json, packOutput.createPathProvider(PackOutput.Target.DATA_PACK, TagManager.getTagDir(Registries.BIOME)).json(resourcelocation));
-				}
+
+				var removed = tagbuilder.getRemoveEntries().toList();
+				JsonObject json = TagFile.CODEC.encodeStart(JsonOps.INSTANCE, new TagFile(list, tagbuilder.isReplace(), removed)).getOrThrow(false, LOGGER::error).getAsJsonObject();
+				return DataProvider.saveStable(cache, json, packOutput.createPathProvider(PackOutput.Target.DATA_PACK, TagManager.getTagDir(Registries.BIOME)).json(resourcelocation));
+
 			}).toArray((p_253442_) -> {
 				return new CompletableFuture[p_253442_];
 			}));
@@ -98,13 +86,6 @@ public abstract class TLReGenTagsWorldgenBiome extends MasterResourceGenerator i
 	/*
 	 * PENDING CLEANUP
 	 */
-
-	private boolean missing(TagEntry reference) {
-		if (reference.isRequired()) {
-			return helper == null || !helper.exists(reference.getId(), reference.isTag() ? resourceType : elementResourceType);
-		}
-		return false;
-	}
 
 	protected Path getPath(ResourceLocation id) {
 		return packOutput.createPathProvider(PackOutput.Target.DATA_PACK, TagManager.getTagDir(Registries.BIOME)).json(id);

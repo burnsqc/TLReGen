@@ -21,4 +21,11 @@ public class ResourceLocationHelper {
 	public static ResourceLocation replace(ResourceLocation rl, String regex, String replacement) {
 		return new ResourceLocation(rl.getNamespace(), rl.getPath().replaceAll(regex, replacement));
 	}
+
+	public static ResourceLocation extendWithFolder(ResourceLocation rl) {
+		if (rl.getPath().contains("/")) {
+			return rl;
+		}
+		return new ResourceLocation(rl.getNamespace(), "block/" + rl.getPath());
+	}
 }
