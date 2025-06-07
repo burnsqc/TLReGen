@@ -4,7 +4,7 @@ import com.tlregen.api.resourcegen.util.TLReGenSoundDefinition;
 
 import net.minecraft.resources.ResourceLocation;
 
-public interface TLReGenSoundHelper {
+public class TLReGenSoundHelper {
 	/**
 	 * Single Sound
 	 * 
@@ -12,7 +12,7 @@ public interface TLReGenSoundHelper {
 	 * 
 	 * @return
 	 */
-	default TLReGenSoundDefinition sounds(ResourceLocation name) {
+	public static TLReGenSoundDefinition sounds(ResourceLocation name) {
 		return new TLReGenSoundDefinition().with(sound(name));
 	}
 
@@ -24,7 +24,7 @@ public interface TLReGenSoundHelper {
 	 * 
 	 * @return
 	 */
-	default TLReGenSoundDefinition sounds(int attenuationDistance, ResourceLocation name) {
+	public static TLReGenSoundDefinition sounds(int attenuationDistance, ResourceLocation name) {
 		return new TLReGenSoundDefinition().with(sound(name).attenuationDistance(attenuationDistance));
 	}
 
@@ -36,11 +36,11 @@ public interface TLReGenSoundHelper {
 	 * 
 	 * @return
 	 */
-	default TLReGenSoundDefinition sounds(ResourceLocation name, float volume) {
+	public static TLReGenSoundDefinition sounds(ResourceLocation name, float volume) {
 		return new TLReGenSoundDefinition().with(sound(name).volume(volume));
 	}
 
-	default TLReGenSoundDefinition sounds(ResourceLocation... sounds) {
+	public static TLReGenSoundDefinition sounds(ResourceLocation... sounds) {
 		TLReGenSoundDefinition definition = new TLReGenSoundDefinition();
 		for (ResourceLocation sound : sounds) {
 			definition.with(sound(sound));
@@ -48,7 +48,7 @@ public interface TLReGenSoundHelper {
 		return definition;
 	}
 
-	static TLReGenSoundDefinition.Sound sound(final ResourceLocation name) {
+	public static TLReGenSoundDefinition.Sound sound(final ResourceLocation name) {
 		return TLReGenSoundDefinition.Sound.sound(name, TLReGenSoundDefinition.SoundType.SOUND);
 	}
 }

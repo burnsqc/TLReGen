@@ -24,7 +24,6 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 
 public class TLReGenDimension extends MasterResourceGenerator implements DataProvider {
-	private final CompletableFuture<HolderLookup.Provider> completables = lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.LEVEL_STEM, TLReGenDimension::bootstrap)));
 	public static BootstapContext<LevelStem> bootstrapContext;
 	public static DynamicRegister<LevelStem> dynamicRegister;
 
@@ -34,11 +33,9 @@ public class TLReGenDimension extends MasterResourceGenerator implements DataPro
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		return completables.thenCompose((provider) -> {
+		return lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.LEVEL_STEM, TLReGenDimension::bootstrap))).thenCompose((provider) -> {
 			DynamicOps<JsonElement> dynamicops = RegistryOps.create(dynamicOps, provider);
-			return CompletableFuture.allOf(DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().flatMap((registryData) -> {
-				return dumpRegistryCap(cache, provider, dynamicops, registryData).stream();
-			}).toArray(CompletableFuture[]::new));
+			return CompletableFuture.allOf(DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().flatMap((registryData) -> dumpRegistryCap(cache, provider, dynamicops, registryData).stream()).toArray(CompletableFuture[]::new));
 		});
 	}
 
