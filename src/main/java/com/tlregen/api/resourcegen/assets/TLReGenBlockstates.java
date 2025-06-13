@@ -15,14 +15,12 @@ import com.google.gson.JsonObject;
 import com.tlregen.api.resourcegen.TLReGenAssetProvider;
 import com.tlregen.api.resourcegen.util.TLReGenConfiguredModel;
 import com.tlregen.api.resourcegen.util.TLReGenVariantBlockStateBuilder;
-import com.tlregen.util.ResourceLocationHelper;
 
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.IGeneratedBlockState;
-import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.client.model.generators.MultiPartBlockStateBuilder;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -89,7 +87,7 @@ public class TLReGenBlockstates extends TLReGenAssetProvider {
 		return ret;
 	}
 
-	public MultiPartBlockStateBuilder getMultipartBuilder(Block b) {
+	public static MultiPartBlockStateBuilder getMultipartBuilder(Block b) {
 		MultiPartBlockStateBuilder ret = new MultiPartBlockStateBuilder(b);
 		resources.put(b, ret);
 		return ret;
@@ -100,16 +98,7 @@ public class TLReGenBlockstates extends TLReGenAssetProvider {
 		return new ResourceLocation(name.getNamespace(), ModelProvider.BLOCK_FOLDER + "/" + name.getPath());
 	}
 
-	public ModelFile.ExistingModelFile getExistingFile(ResourceLocation path) {
-		ModelFile.ExistingModelFile ret = new ModelFile.ExistingModelFile(ResourceLocationHelper.extendWithFolder(path), helper);
-		ret.assertExistence();
-		return ret;
-	}
-
 	@Override
 	protected void populate() {
-		// TODO Auto-generated method stub
-
 	}
-
 }

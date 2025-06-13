@@ -48,11 +48,6 @@ public class TLReGenModels {
 		return ForgeRegistries.BLOCKS.getKey(block).getPath();
 	}
 
-	public ResourceLocation blockTexture(Block block) {
-		ResourceLocation name = ForgeRegistries.BLOCKS.getKey(block);
-		return new ResourceLocation(name.getNamespace(), "block/" + name.getPath());
-	}
-
 	/*
 	 * WITH EXISTING PARENT
 	 */
@@ -69,10 +64,6 @@ public class TLReGenModels {
 	 */
 	public ModelBuilder<BlockModelBuilder> singleTexture(String name, String parent, String textureKey, ResourceLocation texture) {
 		return singleTexture(name, new ResourceLocation(parent), textureKey, texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> singleTexture(String name, String parent, ResourceLocation texture) {
-		return singleTexture(name, new ResourceLocation(parent), texture);
 	}
 
 	public ModelBuilder<BlockModelBuilder> singleTexture(String name, ResourceLocation parent, ResourceLocation texture) {
@@ -197,10 +188,6 @@ public class TLReGenModels {
 		return withExistingParent(name(block) + "_stage" + stage, "block/cross").texture("cross", texture + "_stage" + stage).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> button(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/button", texture);
-	}
-
 	public ModelBuilder<BlockModelBuilder> button(Block block, ResourceLocation texture, String renderType) {
 		return withExistingParent(name(block), "block/button").texture("texture", texture).renderType(renderType);
 	}
@@ -209,16 +196,8 @@ public class TLReGenModels {
 		return withExistingParent(name(block) + "_inventory", "block/button_inventory").texture("texture", texture).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> buttonPressed(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/button_pressed", texture);
-	}
-
 	public ModelBuilder<BlockModelBuilder> buttonPressed(Block block, ResourceLocation texture, String renderType) {
 		return withExistingParent(name(block) + "_pressed", "block/button_pressed").texture("texture", texture).renderType(renderType);
-	}
-
-	public ModelBuilder<BlockModelBuilder> cubeAll(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/cube_all", "all", texture);
 	}
 
 	public ModelBuilder<BlockModelBuilder> cubeAll(Block block, ResourceLocation texture) {
@@ -229,24 +208,12 @@ public class TLReGenModels {
 		return singleTexture(name(block), "block/cube_all", "all", texture).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> cubeBottomTop(String name, ResourceLocation side, ResourceLocation bottom, ResourceLocation top) {
-		return withExistingParent(name, "block/cube_bottom_top").texture("side", side).texture("bottom", bottom).texture("top", top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> cubeColumn(String name, ResourceLocation side, ResourceLocation end) {
-		return withExistingParent(name, "block/cube_column").texture("side", side).texture("end", end);
-	}
-
 	public ModelBuilder<BlockModelBuilder> cubeColumn(Block block, ResourceLocation side, ResourceLocation end) {
 		return withExistingParent(name(block), "block/cube_column").texture("side", side).texture("end", end).renderType("solid");
 	}
 
 	public ModelBuilder<BlockModelBuilder> cubeColumn(Block block, ResourceLocation side, ResourceLocation end, String renderType) {
 		return withExistingParent(name(block), "block/cube_column").texture("side", side).texture("end", end).renderType(renderType);
-	}
-
-	public ModelBuilder<BlockModelBuilder> cubeColumnHorizontal(String name, ResourceLocation side, ResourceLocation end) {
-		return withExistingParent(name, "block/cube_column_horizontal").texture("side", side).texture("end", end);
 	}
 
 	public ModelBuilder<BlockModelBuilder> cubeColumnHorizontal(Block block, ResourceLocation side, ResourceLocation end) {
@@ -257,16 +224,8 @@ public class TLReGenModels {
 		return withExistingParent(name(block) + "_horizontal", "block/cube_column_horizontal").texture("side", side).texture("end", end).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> crop(String name, ResourceLocation crop) {
-		return singleTexture(name, "block/crop", "crop", crop);
-	}
-
 	public ModelBuilder<BlockModelBuilder> crop(Block block, int stage, ResourceLocation texture, String renderType) {
 		return withExistingParent(name(block) + "_stage" + stage, "block/crop").texture("crop", texture + "_stage" + stage).renderType(renderType);
-	}
-
-	public ModelBuilder<BlockModelBuilder> cross(String name, ResourceLocation cross) {
-		return singleTexture(name, "block/cross", "cross", cross);
 	}
 
 	public ModelBuilder<BlockModelBuilder> doorBottomLeft(Block block, ResourceLocation bottom, ResourceLocation top, String renderType) {
@@ -301,42 +260,6 @@ public class TLReGenModels {
 		return withExistingParent(name(block) + "_top_right_open", "block/door_top_right_open").texture("bottom", bottom).texture("top", top).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> door(String name, String model, ResourceLocation bottom, ResourceLocation top) {
-		return withExistingParent(name, "block/" + model).texture("bottom", bottom).texture("top", top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorBottomLeft(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_bottom_left", bottom, top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorBottomLeftOpen(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_bottom_left_open", bottom, top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorBottomRight(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_bottom_right", bottom, top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorBottomRightOpen(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_bottom_right_open", bottom, top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorTopLeft(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_top_left", bottom, top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorTopLeftOpen(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_top_left_open", bottom, top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorTopRight(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_top_right", bottom, top);
-	}
-
-	public ModelBuilder<BlockModelBuilder> doorTopRightOpen(String name, ResourceLocation bottom, ResourceLocation top) {
-		return door(name, "door_top_right_open", bottom, top);
-	}
-
 	public ModelBuilder<BlockModelBuilder> fencePost(Block block, ResourceLocation texture, String renderType) {
 		return singleTexture(ResourceLocationHelper.getPath(block) + "_post", new ResourceLocation("fence_post"), texture).renderType(renderType);
 	}
@@ -347,30 +270,6 @@ public class TLReGenModels {
 
 	public ModelBuilder<BlockModelBuilder> fenceInventory(Block block, ResourceLocation texture, String renderType) {
 		return singleTexture(ResourceLocationHelper.getPath(block) + "_inventory", new ResourceLocation("fence_inventory"), texture).renderType(renderType);
-	}
-
-	public ModelBuilder<BlockModelBuilder> fencePost(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/fence_post", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> fenceSide(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/fence_side", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> fenceGate(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_fence_gate", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> fenceGateOpen(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_fence_gate_open", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> fenceGateWall(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_fence_gate_wall", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> fenceGateWallOpen(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_fence_gate_wall_open", texture);
 	}
 
 	public ModelBuilder<BlockModelBuilder> fenceGate(Block block, ResourceLocation texture, String renderType) {
@@ -393,10 +292,6 @@ public class TLReGenModels {
 		return withExistingParent(name(block) + "_stage" + stage, "block/stem_growth" + stage).texture("stem", texture).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> orientable(String name, ResourceLocation side, ResourceLocation front, ResourceLocation top) {
-		return withExistingParent(name, "block/orientable").texture("side", side).texture("front", front).texture("top", top);
-	}
-
 	public ModelBuilder<BlockModelBuilder> pottedSapling(Block block, ResourceLocation plant, String renderType) {
 		return withExistingParent(name(block), "block/flower_pot_cross").texture("plant", plant).renderType(renderType);
 	}
@@ -409,24 +304,12 @@ public class TLReGenModels {
 		return singleTexture(ResourceLocationHelper.getPath(block) + "_down", new ResourceLocation("pressure_plate_down"), texture).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> pressurePlateDown(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/pressure_plate_down", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> pressurePlateUp(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/pressure_plate_up", texture);
-	}
-
 	public ModelBuilder<BlockModelBuilder> sapling(Block block, ResourceLocation cross, String renderType) {
 		return withExistingParent(name(block), "block/cross").texture("cross", cross).renderType(renderType);
 	}
 
 	public ModelBuilder<BlockModelBuilder> sign(Block block, ResourceLocation texture, String renderType) {
 		return getBuilder(name(block)).texture("particle", texture).renderType(renderType);
-	}
-
-	public ModelBuilder<BlockModelBuilder> skull() {
-		return getBuilder("minecraft:block/skull");
 	}
 
 	public ModelBuilder<BlockModelBuilder> slab(Block block, ResourceLocation bottom, ResourceLocation side, ResourceLocation top, String renderType) {
@@ -449,10 +332,6 @@ public class TLReGenModels {
 		return withExistingParent(name(block) + "_outer", "block/outer_stairs").texture("bottom", bottom).texture("side", side).texture("top", top).renderType(renderType);
 	}
 
-	public ModelBuilder<BlockModelBuilder> stairs(String name, ResourceLocation side, ResourceLocation bottom, ResourceLocation top) {
-		return withExistingParent(name, "block/stairs").texture("side", side).texture("bottom", bottom).texture("top", top);
-	}
-
 	public ModelBuilder<BlockModelBuilder> trapdoorBottom(Block block, ResourceLocation texture, String renderType) {
 		return singleTexture(ResourceLocationHelper.getPath(block) + "_bottom", new ResourceLocation("template_orientable_trapdoor_bottom"), texture).renderType(renderType);
 	}
@@ -463,29 +342,5 @@ public class TLReGenModels {
 
 	public ModelBuilder<BlockModelBuilder> trapdoorTop(Block block, ResourceLocation texture, String renderType) {
 		return singleTexture(ResourceLocationHelper.getPath(block) + "_top", new ResourceLocation("template_orientable_trapdoor_top"), texture).renderType(renderType);
-	}
-
-	public ModelBuilder<BlockModelBuilder> trapdoorOrientableBottom(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_orientable_trapdoor_bottom", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> trapdoorOrientableTop(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_orientable_trapdoor_top", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> trapdoorOrientableOpen(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_orientable_trapdoor_open", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> trapdoorBottom(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_trapdoor_bottom", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> trapdoorOpen(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_trapdoor_open", texture);
-	}
-
-	public ModelBuilder<BlockModelBuilder> trapdoorTop(String name, ResourceLocation texture) {
-		return singleTexture(name, "block/template_trapdoor_top", texture);
 	}
 }
