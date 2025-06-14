@@ -23,6 +23,10 @@ public class VanillaModels {
 		return itemModelBuilder;
 	}
 
+	/*
+	 * RESOURCE LOCATION HELPERS
+	 */
+
 	private static ResourceLocation extendWithFolder(ResourceLocation rl) {
 		return rl.getPath().contains("/") ? rl : new ResourceLocation(rl.getNamespace(), "item/" + rl.getPath());
 	}
@@ -46,6 +50,10 @@ public class VanillaModels {
 	private static ResourceLocation blockTexture(Item item) {
 		return new ResourceLocation(nameSpace(item), "block/" + path(item));
 	}
+
+	/*
+	 * ITEM MODELS
+	 */
 
 	public static ItemModelBuilder item2D(Item item) {
 		return itemModel(path(item)).parent(GENERATED).texture("layer0", itemTexture(item));
