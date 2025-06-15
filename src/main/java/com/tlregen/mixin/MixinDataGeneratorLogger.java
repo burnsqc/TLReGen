@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,14 +28,19 @@ public abstract class MixinDataGeneratorLogger {
 	@Unique
 	private static final Marker RESOURCEGEN = MarkerManager.getMarker("RESOURCEGEN");
 	@Shadow
+	@Final
 	Map<String, DataProvider> providersToRun;
 	@Shadow
+	@Final
 	boolean alwaysGenerate;
 	@Shadow
+	@Final
 	Path rootOutputFolder;
 	@Shadow
+	@Final
 	Set<String> allProviderIds;
 	@Shadow
+	@Final
 	WorldVersion version;
 	@Unique
 	private int previousWrites;
