@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
 import com.tlregen.api.registration.DynamicRegister;
 import com.tlregen.api.resourcegen.MasterResourceGenerator;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 import com.tlregen.api.resourcegen.util.TLReGenRegistrySetBuilder;
 
 import net.minecraft.core.HolderLookup;
@@ -23,17 +24,18 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 
-public class TLReGenWorldgenNoiseSettings extends MasterResourceGenerator implements DataProvider {
+public class TLReGenWorldgenNoiseSettings extends TLReGenResourceGenerator {
 	public static BootstapContext<NoiseGeneratorSettings> bootstrapContext;
 	public static DynamicRegister<NoiseGeneratorSettings> dynamicRegister;
 
-	public TLReGenWorldgenNoiseSettings(DynamicRegister<NoiseGeneratorSettings> dynReg) {
+	public TLReGenWorldgenNoiseSettings(DynamicRegister<NoiseGeneratorSettings> dynReg, String modID, PackOutput packOutput) {
+		super(modID, Types.NOISE_SETTING, packOutput);
 		dynamicRegister = dynReg;
 	}
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		return lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.NOISE_SETTINGS, TLReGenWorldgenNoiseSettings::bootstrap))).thenCompose((provider) -> {
+		return MasterResourceGenerator.lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.NOISE_SETTINGS, TLReGenWorldgenNoiseSettings::bootstrap))).thenCompose((provider) -> {
 			DynamicOps<JsonElement> dynamicops = RegistryOps.create(dynamicOps, provider);
 			return CompletableFuture.allOf(DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().flatMap((registryData) -> dumpRegistryCap(cache, provider, dynamicops, registryData).stream()).toArray(CompletableFuture[]::new));
 		});
@@ -43,7 +45,7 @@ public class TLReGenWorldgenNoiseSettings extends MasterResourceGenerator implem
 		return lookupProvider.lookup(registryData.key()).map((registryLookup) -> {
 			return CompletableFuture.allOf(registryLookup.listElements().map((reference) -> {
 				JsonObject json = registryData.elementCodec().encodeStart(dynamicops, reference.value()).getOrThrow(false, msg -> LOGGER.error("Failed to encode")).getAsJsonObject();
-				return DataProvider.saveStable(cache, json, packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "worldgen/noise_settings").json(reference.key().location()));
+				return DataProvider.saveStable(cache, json, pathProvider.json(reference.key().location()));
 			}).toArray(CompletableFuture[]::new));
 		});
 	}
@@ -55,10 +57,5 @@ public class TLReGenWorldgenNoiseSettings extends MasterResourceGenerator implem
 	private static void bootstrap(final BootstapContext<NoiseGeneratorSettings> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
-	}
-
-	@Override
-	public final String getName() {
-		return "data." + modID + ".worldgen.noise_settings";
 	}
 }

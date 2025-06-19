@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
 import com.tlregen.api.registration.DynamicRegister;
 import com.tlregen.api.resourcegen.MasterResourceGenerator;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 import com.tlregen.api.resourcegen.util.TLReGenRegistrySetBuilder;
 
 import net.minecraft.core.HolderLookup;
@@ -23,17 +24,18 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 
-public class TLReGenWorldgenDensityFunction extends MasterResourceGenerator implements DataProvider {
+public class TLReGenWorldgenDensityFunction extends TLReGenResourceGenerator {
 	public static BootstapContext<DensityFunction> bootstrapContext;
 	public static DynamicRegister<DensityFunction> dynamicRegister;
 
-	public TLReGenWorldgenDensityFunction(DynamicRegister<DensityFunction> dynReg) {
+	public TLReGenWorldgenDensityFunction(DynamicRegister<DensityFunction> dynReg, String modID, PackOutput packOutput) {
+		super(modID, Types.DENSITY_FUNCTION, packOutput);
 		dynamicRegister = dynReg;
 	}
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		return lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.DENSITY_FUNCTION, TLReGenWorldgenDensityFunction::bootstrap))).thenCompose((provider) -> {
+		return MasterResourceGenerator.lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.DENSITY_FUNCTION, TLReGenWorldgenDensityFunction::bootstrap))).thenCompose((provider) -> {
 			DynamicOps<JsonElement> dynamicops = RegistryOps.create(dynamicOps, provider);
 			return CompletableFuture.allOf(DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().flatMap((registryData) -> dumpRegistryCap(cache, provider, dynamicops, registryData).stream()).toArray(CompletableFuture[]::new));
 		});
@@ -43,7 +45,7 @@ public class TLReGenWorldgenDensityFunction extends MasterResourceGenerator impl
 		return lookupProvider.lookup(registryData.key()).map((registryLookup) -> {
 			return CompletableFuture.allOf(registryLookup.listElements().map((reference) -> {
 				JsonObject json = registryData.elementCodec().encodeStart(dynamicops, reference.value()).getOrThrow(false, msg -> LOGGER.error("Failed to encode")).getAsJsonObject();
-				return DataProvider.saveStable(cache, json, packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "worldgen/density_function").json(reference.key().location()));
+				return DataProvider.saveStable(cache, json, pathProvider.json(reference.key().location()));
 			}).toArray(CompletableFuture[]::new));
 		});
 	}
@@ -55,10 +57,5 @@ public class TLReGenWorldgenDensityFunction extends MasterResourceGenerator impl
 	private static void bootstrap(final BootstapContext<DensityFunction> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
-	}
-
-	@Override
-	public final String getName() {
-		return "data." + modID + ".worldgen.density_function";
 	}
 }

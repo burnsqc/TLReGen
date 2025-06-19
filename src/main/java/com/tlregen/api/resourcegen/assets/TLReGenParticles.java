@@ -8,16 +8,18 @@ import java.util.concurrent.CompletableFuture;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.tlregen.api.resourcegen.TLReGenAssetProvider;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 
-public class TLReGenParticles extends TLReGenAssetProvider {
+public class TLReGenParticles extends TLReGenResourceGenerator {
 	private Map<ResourceLocation, List<String>> resources = new HashMap<>();
 
-	public TLReGenParticles(Map<ResourceLocation, List<String>> resources) {
+	public TLReGenParticles(Map<ResourceLocation, List<String>> resources, String modID, PackOutput packOutput) {
+		super(modID, Types.PARTICLE, packOutput);
 		this.resources = resources;
 	}
 
@@ -29,19 +31,8 @@ public class TLReGenParticles extends TLReGenAssetProvider {
 			JsonArray textures = new JsonArray();
 			value.forEach(textures::add);
 			json.add("textures", textures);
-			list.add(DataProvider.saveStable(cache, json, packOutput.createPathProvider(target, "particles").json(key)));
+			list.add(DataProvider.saveStable(cache, json, pathProvider.json(key)));
 		});
 		return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
-	}
-
-	@Override
-	public final String getName() {
-		return super.getName() + ".particles";
-	}
-
-	@Override
-	protected void populate() {
-		// TODO Auto-generated method stub
-
 	}
 }

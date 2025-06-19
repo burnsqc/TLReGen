@@ -7,17 +7,19 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.gson.JsonObject;
-import com.tlregen.api.resourcegen.TLReGenAssetProvider;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 
-public class TLReGenModelsBlock extends TLReGenAssetProvider {
+public class TLReGenModelsBlock extends TLReGenResourceGenerator {
 	private Map<ResourceLocation, BlockModelBuilder> resources = new HashMap<>();
 
-	public TLReGenModelsBlock(Map<ResourceLocation, BlockModelBuilder> resources) {
+	public TLReGenModelsBlock(Map<ResourceLocation, BlockModelBuilder> resources, String modID, PackOutput packOutput) {
+		super(modID, Types.BLOCK_MODEL, packOutput);
 		this.resources = resources;
 	}
 
@@ -26,17 +28,8 @@ public class TLReGenModelsBlock extends TLReGenAssetProvider {
 		List<CompletableFuture<?>> list = new ArrayList<CompletableFuture<?>>();
 		resources.forEach((key, value) -> {
 			JsonObject json = value.toJson();
-			list.add(DataProvider.saveStable(cache, json, packOutput.createPathProvider(target, "models/block").json(key)));
+			list.add(DataProvider.saveStable(cache, json, pathProvider.json(key)));
 		});
 		return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
-	}
-
-	@Override
-	public final String getName() {
-		return super.getName() + ".models.block";
-	}
-
-	@Override
-	protected void populate() {
 	}
 }

@@ -7,18 +7,20 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.gson.JsonObject;
-import com.tlregen.api.resourcegen.TLReGenAssetProvider;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.renderer.texture.atlas.SpriteSources;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 
-public class TLReGenAtlases extends TLReGenAssetProvider {
+public class TLReGenAtlases extends TLReGenResourceGenerator {
 	private Map<ResourceLocation, List<SpriteSource>> resources = new HashMap<>();
 
-	public TLReGenAtlases(Map<ResourceLocation, List<SpriteSource>> resources) {
+	public TLReGenAtlases(Map<ResourceLocation, List<SpriteSource>> resources, String modID, PackOutput packOutput) {
+		super(modID, Types.ATLAS, packOutput);
 		this.resources = resources;
 	}
 
@@ -27,14 +29,9 @@ public class TLReGenAtlases extends TLReGenAssetProvider {
 		List<CompletableFuture<?>> list = new ArrayList<CompletableFuture<?>>();
 		resources.forEach((key, value) -> {
 			JsonObject json = SpriteSources.FILE_CODEC.encodeStart(dynamicOps, value).getOrThrow(false, msg -> LOGGER.error("Failed to encode")).getAsJsonObject();
-			list.add(DataProvider.saveStable(cache, json, packOutput.createPathProvider(target, "atlases").json(key)));
+			list.add(DataProvider.saveStable(cache, json, pathProvider.json(key)));
 		});
 		return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
-	}
-
-	@Override
-	public final String getName() {
-		return super.getName() + ".atlases";
 	}
 
 	public class VanillaAtlases {
@@ -49,11 +46,6 @@ public class TLReGenAtlases extends TLReGenAssetProvider {
 		public final static ResourceLocation PARTICLES = new ResourceLocation("particles");
 		public final static ResourceLocation SHIELD_PATTERNS = new ResourceLocation("shield_patterns");
 		public final static ResourceLocation SHULKER_BOXES = new ResourceLocation("shulker_boxes");
-		public final static ResourceLocation SIGNS = new ResourceLocation("chests");
-	}
-
-	@Override
-	protected void populate() {
-		// TODO Auto-generated method stub
+		public final static ResourceLocation SIGNS = new ResourceLocation("signs");
 	}
 }

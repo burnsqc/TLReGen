@@ -12,40 +12,32 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.tlregen.api.resourcegen.TLReGenAssetProvider;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 import com.tlregen.api.resourcegen.util.TLReGenConfiguredModel;
-import com.tlregen.api.resourcegen.util.TLReGenVariantBlockStateBuilder;
 
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.IGeneratedBlockState;
-import net.minecraftforge.client.model.generators.ModelProvider;
-import net.minecraftforge.client.model.generators.MultiPartBlockStateBuilder;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class TLReGenBlockstates extends TLReGenAssetProvider {
-	private final static Map<Block, IGeneratedBlockState> resources = new HashMap<>();
+public class TLReGenBlockstates extends TLReGenResourceGenerator {
+	private Map<Block, IGeneratedBlockState> resources = new HashMap<>();
 
-	public TLReGenBlockstates(Map<Block, IGeneratedBlockState> mapIn) {
-		mapIn.forEach((k, v) -> resources.put(k, v));
+	public TLReGenBlockstates(Map<Block, IGeneratedBlockState> resources, String modID, PackOutput packOutput) {
+		super(modID, Types.BLOCKSTATE, packOutput);
+		this.resources = resources;
 	}
 
 	@Override
 	public final CompletableFuture<?> run(final CachedOutput cache) {
-		populate();
 		List<CompletableFuture<?>> list = new ArrayList<CompletableFuture<?>>();
 		resources.forEach((key, value) -> {
 			JsonObject json = value.toJson();
-			list.add(DataProvider.saveStable(cache, json, packOutput.createPathProvider(target, "blockstates").json(ForgeRegistries.BLOCKS.getKey(key))));
+			list.add(DataProvider.saveStable(cache, json, pathProvider.json(ForgeRegistries.BLOCKS.getKey(key))));
 		});
 		return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
-	}
-
-	@Override
-	public final String getName() {
-		return super.getName() + ".blockstates";
 	}
 
 	/*
@@ -79,26 +71,5 @@ public class TLReGenBlockstates extends TLReGenAssetProvider {
 		public ConfiguredModelList append(TLReGenConfiguredModel... models) {
 			return new ConfiguredModelList(ImmutableList.<TLReGenConfiguredModel>builder().addAll(this.models).add(models).build());
 		}
-	}
-
-	public static TLReGenVariantBlockStateBuilder getVariantBuilder(Block b) {
-		TLReGenVariantBlockStateBuilder ret = new TLReGenVariantBlockStateBuilder(b);
-		resources.put(b, ret);
-		return ret;
-	}
-
-	public static MultiPartBlockStateBuilder getMultipartBuilder(Block b) {
-		MultiPartBlockStateBuilder ret = new MultiPartBlockStateBuilder(b);
-		resources.put(b, ret);
-		return ret;
-	}
-
-	public static ResourceLocation blockTexture(Block block) {
-		ResourceLocation name = ForgeRegistries.BLOCKS.getKey(block);
-		return new ResourceLocation(name.getNamespace(), ModelProvider.BLOCK_FOLDER + "/" + name.getPath());
-	}
-
-	@Override
-	protected void populate() {
 	}
 }

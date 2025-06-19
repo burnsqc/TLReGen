@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
 import com.tlregen.api.registration.DynamicRegister;
 import com.tlregen.api.resourcegen.MasterResourceGenerator;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 import com.tlregen.api.resourcegen.util.TLReGenRegistrySetBuilder;
 
 import net.minecraft.core.HolderLookup;
@@ -23,17 +24,18 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 
-public class TLReGenWorldgenStructureSet extends MasterResourceGenerator implements DataProvider {
+public class TLReGenWorldgenStructureSet extends TLReGenResourceGenerator {
 	public static BootstapContext<StructureSet> bootstrapContext;
 	public static DynamicRegister<StructureSet> dynamicRegister;
 
-	public TLReGenWorldgenStructureSet(DynamicRegister<StructureSet> dynReg) {
+	public TLReGenWorldgenStructureSet(DynamicRegister<StructureSet> dynReg, String modID, PackOutput packOutput) {
+		super(modID, Types.STRUCTURE_SET, packOutput);
 		dynamicRegister = dynReg;
 	}
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		return lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.STRUCTURE_SET, TLReGenWorldgenStructureSet::bootstrap))).thenCompose((provider) -> {
+		return MasterResourceGenerator.lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.STRUCTURE_SET, TLReGenWorldgenStructureSet::bootstrap))).thenCompose((provider) -> {
 			DynamicOps<JsonElement> dynamicops = RegistryOps.create(dynamicOps, provider);
 			return CompletableFuture.allOf(DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().flatMap((registryData) -> dumpRegistryCap(cache, provider, dynamicops, registryData).stream()).toArray(CompletableFuture[]::new));
 		});
@@ -43,7 +45,7 @@ public class TLReGenWorldgenStructureSet extends MasterResourceGenerator impleme
 		return lookupProvider.lookup(registryData.key()).map((registryLookup) -> {
 			return CompletableFuture.allOf(registryLookup.listElements().map((reference) -> {
 				JsonObject json = registryData.elementCodec().encodeStart(dynamicops, reference.value()).getOrThrow(false, msg -> LOGGER.error("Failed to encode")).getAsJsonObject();
-				return DataProvider.saveStable(cache, json, packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "worldgen/structure_set").json(reference.key().location()));
+				return DataProvider.saveStable(cache, json, pathProvider.json(reference.key().location()));
 			}).toArray(CompletableFuture[]::new));
 		});
 	}
@@ -55,10 +57,5 @@ public class TLReGenWorldgenStructureSet extends MasterResourceGenerator impleme
 	private static void bootstrap(final BootstapContext<StructureSet> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
-	}
-
-	@Override
-	public final String getName() {
-		return "data." + modID + ".worldgen.structure_set";
 	}
 }

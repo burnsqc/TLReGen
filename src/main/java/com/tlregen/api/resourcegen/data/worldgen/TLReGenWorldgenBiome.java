@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.mojang.serialization.DynamicOps;
 import com.tlregen.api.registration.DynamicRegister;
 import com.tlregen.api.resourcegen.MasterResourceGenerator;
+import com.tlregen.api.resourcegen.TLReGenResourceGenerator;
 import com.tlregen.api.resourcegen.util.TLReGenRegistrySetBuilder;
 
 import net.minecraft.core.HolderLookup;
@@ -23,17 +24,18 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.DataPackRegistriesHooks;
 
-public class TLReGenWorldgenBiome extends MasterResourceGenerator implements DataProvider {
+public class TLReGenWorldgenBiome extends TLReGenResourceGenerator {
 	public static BootstapContext<Biome> bootstrapContext;
 	public static DynamicRegister<Biome> dynamicRegister;
 
-	public TLReGenWorldgenBiome(DynamicRegister<Biome> dynReg) {
+	public TLReGenWorldgenBiome(DynamicRegister<Biome> dynReg, String modID, PackOutput packOutput) {
+		super(modID, Types.BIOME, packOutput);
 		dynamicRegister = dynReg;
 	}
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		return lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.BIOME, TLReGenWorldgenBiome::bootstrap))).thenCompose((provider) -> {
+		return MasterResourceGenerator.lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.BIOME, TLReGenWorldgenBiome::bootstrap))).thenCompose((provider) -> {
 			DynamicOps<JsonElement> dynamicops = RegistryOps.create(dynamicOps, provider);
 			return CompletableFuture.allOf(DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().flatMap((registryData) -> dumpRegistryCap(cache, provider, dynamicops, registryData).stream()).toArray(CompletableFuture[]::new));
 		});
@@ -43,7 +45,7 @@ public class TLReGenWorldgenBiome extends MasterResourceGenerator implements Dat
 		return lookupProvider.lookup(registryData.key()).map((registryLookup) -> {
 			return CompletableFuture.allOf(registryLookup.listElements().map((reference) -> {
 				JsonObject json = registryData.elementCodec().encodeStart(dynamicops, reference.value()).getOrThrow(false, msg -> LOGGER.error("Failed to encode")).getAsJsonObject();
-				return DataProvider.saveStable(cache, json, packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "worldgen/biome").json(reference.key().location()));
+				return DataProvider.saveStable(cache, json, pathProvider.json(reference.key().location()));
 			}).toArray(CompletableFuture[]::new));
 		});
 	}
@@ -55,10 +57,5 @@ public class TLReGenWorldgenBiome extends MasterResourceGenerator implements Dat
 	private static void bootstrap(final BootstapContext<Biome> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
-	}
-
-	@Override
-	public final String getName() {
-		return "data." + modID + ".worldgen.biome";
 	}
 }
