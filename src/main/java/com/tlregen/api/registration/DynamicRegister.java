@@ -4,7 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.Registry;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
@@ -12,6 +14,7 @@ public class DynamicRegister<T> {
 	private final ResourceKey<? extends Registry<T>> registryKey;
 	private final String modid;
 	private final Map<ResourceKey<T>, Supplier<T>> entries = new LinkedHashMap<>();
+	public BootstapContext<T> bootstrapContext;
 
 	private DynamicRegister(ResourceKey<? extends Registry<T>> registryKey, String modid) {
 		this.registryKey = registryKey;
@@ -49,5 +52,9 @@ public class DynamicRegister<T> {
 			throw new IllegalArgumentException("Duplicate registration " + name);
 		}
 		return ret;
+	}
+
+	public Reference<T> asHolder(ResourceKey<T> key) {
+		return bootstrapContext.lookup(registryKey).getOrThrow(key);
 	}
 }

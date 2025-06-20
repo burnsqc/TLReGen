@@ -56,6 +56,7 @@ public class TLReGenWorldgenStructure extends TLReGenResourceGenerator {
 
 	private static void bootstrap(final BootstapContext<Structure> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
+		dynamicRegister.bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
 	}
 }

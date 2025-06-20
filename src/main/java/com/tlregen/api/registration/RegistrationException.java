@@ -1,6 +1,6 @@
 package com.tlregen.api.registration;
 
-public class RegistrationException extends Exception {
+public class RegistrationException extends RuntimeException {
 	@java.io.Serial
 	private static final long serialVersionUID = -4222015375092547202L;
 

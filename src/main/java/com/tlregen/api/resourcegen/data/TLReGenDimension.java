@@ -26,7 +26,7 @@ import net.minecraftforge.registries.DataPackRegistriesHooks;
 
 public class TLReGenDimension extends TLReGenResourceGenerator {
 	public static BootstapContext<LevelStem> bootstrapContext;
-	public static DynamicRegister<LevelStem> dynamicRegister;
+	private static DynamicRegister<LevelStem> dynamicRegister;
 
 	public TLReGenDimension(DynamicRegister<LevelStem> dynReg, String modID, PackOutput packOutput) {
 		super(modID, Types.DIMENSION, packOutput);
@@ -56,6 +56,7 @@ public class TLReGenDimension extends TLReGenResourceGenerator {
 
 	private static void bootstrap(final BootstapContext<LevelStem> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
+		dynamicRegister.bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
 	}
 }

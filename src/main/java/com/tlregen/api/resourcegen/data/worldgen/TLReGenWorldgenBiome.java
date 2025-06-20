@@ -27,6 +27,7 @@ import net.minecraftforge.registries.DataPackRegistriesHooks;
 public class TLReGenWorldgenBiome extends TLReGenResourceGenerator {
 	public static BootstapContext<Biome> bootstrapContext;
 	public static DynamicRegister<Biome> dynamicRegister;
+	public TLReGenRegistrySetBuilder regset = new TLReGenRegistrySetBuilder().add(Registries.BIOME, TLReGenWorldgenBiome::bootstrap);
 
 	public TLReGenWorldgenBiome(DynamicRegister<Biome> dynReg, String modID, PackOutput packOutput) {
 		super(modID, Types.BIOME, packOutput);
@@ -35,7 +36,7 @@ public class TLReGenWorldgenBiome extends TLReGenResourceGenerator {
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		return MasterResourceGenerator.lookupProvider.thenApply(r -> constructRegistries(r, new TLReGenRegistrySetBuilder().add(Registries.BIOME, TLReGenWorldgenBiome::bootstrap))).thenCompose((provider) -> {
+		return MasterResourceGenerator.lookupProvider.thenApply(r -> constructRegistries(r, regset)).thenCompose((provider) -> {
 			DynamicOps<JsonElement> dynamicops = RegistryOps.create(dynamicOps, provider);
 			return CompletableFuture.allOf(DataPackRegistriesHooks.getDataPackRegistriesWithDimensions().flatMap((registryData) -> dumpRegistryCap(cache, provider, dynamicops, registryData).stream()).toArray(CompletableFuture[]::new));
 		});
@@ -56,6 +57,7 @@ public class TLReGenWorldgenBiome extends TLReGenResourceGenerator {
 
 	private static void bootstrap(final BootstapContext<Biome> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
+		dynamicRegister.bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
 	}
 }

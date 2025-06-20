@@ -56,6 +56,7 @@ public class TLReGenWorldgenConfiguredFeature extends TLReGenResourceGenerator {
 
 	private static void bootstrap(final BootstapContext<ConfiguredFeature<?, ?>> bootstrapContextIn) {
 		bootstrapContext = bootstrapContextIn;
+		dynamicRegister.bootstrapContext = bootstrapContextIn;
 		dynamicRegister.getEntries().forEach((k, v) -> bootstrapContext.register(k, v.get()));
 	}
 }
