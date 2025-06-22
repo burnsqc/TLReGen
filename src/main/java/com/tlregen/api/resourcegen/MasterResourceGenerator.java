@@ -21,6 +21,7 @@ import com.tlregen.api.resourcegen.assets.TLReGenLang;
 import com.tlregen.api.resourcegen.assets.TLReGenModelsBlock;
 import com.tlregen.api.resourcegen.assets.TLReGenModelsItem;
 import com.tlregen.api.resourcegen.assets.TLReGenParticles;
+import com.tlregen.api.resourcegen.assets.TLReGenShadersPost;
 import com.tlregen.api.resourcegen.assets.TLReGenSounds;
 import com.tlregen.api.resourcegen.data.TLReGenDamageType;
 import com.tlregen.api.resourcegen.data.TLReGenDimension;
@@ -36,6 +37,7 @@ import com.tlregen.api.resourcegen.data.worldgen.TLReGenWorldgenPlacedFeature;
 import com.tlregen.api.resourcegen.data.worldgen.TLReGenWorldgenStructure;
 import com.tlregen.api.resourcegen.data.worldgen.TLReGenWorldgenStructureSet;
 import com.tlregen.api.resourcegen.data.worldgen.TLReGenWorldgenTemplatePool;
+import com.tlregen.api.resourcegen.util.TLReGenPostShader;
 import com.tlregen.api.resourcegen.util.TLReGenSoundDefinition;
 
 import net.minecraft.client.gui.font.providers.GlyphProviderDefinition;
@@ -86,6 +88,7 @@ public class MasterResourceGenerator {
 	private Supplier<Map<ResourceLocation, ItemModelBuilder>> itemModels;
 	private Supplier<Map<String, String>> lang;
 	private Supplier<Map<ResourceLocation, List<String>>> particles;
+	private Supplier<Map<ResourceLocation, TLReGenPostShader>> postShaders;
 	private Supplier<Map<String, TLReGenSoundDefinition>> sounds;
 	private Supplier<DynamicRegister<Biome>> biomes;
 	private Supplier<DynamicRegister<BiomeModifier>> biomeModifiers;
@@ -185,6 +188,10 @@ public class MasterResourceGenerator {
 		this.placedFeatures = placedFeatures;
 	}
 
+	public void addPostShaders(Supplier<Map<ResourceLocation, TLReGenPostShader>> postShaders) {
+		this.postShaders = postShaders;
+	}
+
 	public void addSounds(Supplier<Map<String, TLReGenSoundDefinition>> sounds) {
 		this.sounds = sounds;
 	}
@@ -229,6 +236,9 @@ public class MasterResourceGenerator {
 		}
 		if (particles != null) {
 			generator.addProvider(eventIn.includeClient(), new TLReGenParticles(particles.get(), modID, packOutput));
+		}
+		if (postShaders != null) {
+			generator.addProvider(eventIn.includeClient(), new TLReGenShadersPost(postShaders.get(), modID, packOutput));
 		}
 		if (sounds != null) {
 			generator.addProvider(eventIn.includeClient(), new TLReGenSounds(sounds.get(), modID, packOutput));

@@ -62,7 +62,6 @@ public class TLReGenRegistrySetBuilder {
 		});
 		HolderLookup.Provider holderlookup$provider = HolderLookup.Provider.create(Stream.concat(stream, map.values().stream().map(TLReGenRegistrySetBuilder.RegistryContents::buildAsLookup).peek(registrysetbuilder$buildstate::addOwner)));
 		registrysetbuilder$buildstate.fillMissingHolders(provider);
-		// registrysetbuilder$buildstate.reportRemainingUnreferencedValues();
 		registrysetbuilder$buildstate.throwOnError();
 		return holderlookup$provider;
 	}

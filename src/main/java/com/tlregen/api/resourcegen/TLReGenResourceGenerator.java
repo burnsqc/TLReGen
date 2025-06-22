@@ -45,6 +45,7 @@ public abstract class TLReGenResourceGenerator implements DataProvider {
 		NOISE_SETTING(PackOutput.Target.DATA_PACK, "worldgen.noise_settings", "worldgen/noise_settings"), 
 		PARTICLE(PackOutput.Target.RESOURCE_PACK, "particles", "particles"), 
 		PLACED_FEATURE(PackOutput.Target.DATA_PACK, "worldgen.placed_feature", "worldgen/placed_feature"), 
+		POST_SHADER(PackOutput.Target.RESOURCE_PACK, "shaders.post", "shaders/post"), 
 		SOUND(PackOutput.Target.RESOURCE_PACK, "sounds", ""),
 		STRUCTURE(PackOutput.Target.DATA_PACK, "worldgen.structure", "worldgen/structure"), 
 		STRUCTURE_SET(PackOutput.Target.DATA_PACK, "worldgen.structure_set", "worldgen/structure_set"), 
