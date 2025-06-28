@@ -60,7 +60,7 @@ class ClientModEventListeners {
 	Supplier<Map<MenuType<? extends AbstractContainerMenu>, MenuScreens.ScreenConstructor<AbstractContainerMenu, ?>>> screens;
 	Supplier<Map<SkullBlock.Type, ResourceLocation>> skullTextures;
 	Supplier<Map<Fluid, RenderType>> fluidRenderTypes;
-	Supplier<SortedMap<RenderType, BufferBuilder>> renderTypes;
+	Supplier<Map<RenderType, BufferBuilder>> renderTypes;
 
 	ClientModEventListeners(String modid) {
 		modMarker = "(" + TextUtil.stringToAllCapsName(modid) + ")";

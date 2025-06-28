@@ -3,7 +3,6 @@ package com.tlregen.api.setup;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.Marker;
@@ -205,7 +204,7 @@ public class MasterSetupExecutor {
 		}
 	}
 
-	public void addRenderTypes(Supplier<SortedMap<RenderType, BufferBuilder>> renderTypes) {
+	public void addRenderTypes(Supplier<Map<RenderType, BufferBuilder>> renderTypes) {
 		if (FMLEnvironment.dist == Dist.CLIENT) {
 			clientModEventListeners.renderTypes = renderTypes;
 		}
