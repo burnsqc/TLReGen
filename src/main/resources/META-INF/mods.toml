@@ -9,8 +9,7 @@ license="All Rights Reserved"
 	displayName="TLReGen"
 	credits="burnsqc"
 	authors="burnsqc"
-	description='''
-    TL Registration/Generation.  An API between Forge and your mod that streamlines commonly executed initialization, registration, setup, and resource generation logic.'''
+	description='''TL Registration/Generation.  An API between Forge and your mod that streamlines commonly executed initialization, registration, setup, and resource generation logic.'''
 
 [[dependencies.tlregen]]
     modId="forge" 

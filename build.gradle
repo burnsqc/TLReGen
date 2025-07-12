@@ -1,6 +1,6 @@
 plugins {
-    id 'eclipse'
     id 'java'
+    id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
@@ -97,7 +97,7 @@ artifacts {
 
 publishing {
     publications {
-        register('mavenJava', MavenPublication) {
+        register('TLReGen', MavenPublication) {
             artifact jar
             artifact sourcesJar
             artifact javadocJar
@@ -105,8 +105,12 @@ publishing {
     }
     repositories {
         maven {
-        	name = "localMaven"
-            url "file:///${project.projectDir}/maven"
+            name = "Local"
+            url = uri(file("${project.projectDir}/../../Maven"))
+        }
+        maven { 
+            name = "Remote"
+            url "file:///${project.projectDir}/maven2" 
         }
     }
 }
