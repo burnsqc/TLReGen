@@ -51,7 +51,6 @@ public abstract class TLReGenTagsPaintingVariant extends MasterResourceGenerator
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		CompletableFuture<?> completable = CompletableFuture.allOf();
 
 		record CombinedData<T>(HolderLookup.Provider contents, TagsProvider.TagLookup<T> parent) {
 		}

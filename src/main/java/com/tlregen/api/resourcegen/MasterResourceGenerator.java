@@ -28,6 +28,7 @@ import com.tlregen.api.resourcegen.data.TLReGenDimension;
 import com.tlregen.api.resourcegen.data.TLReGenDimensionType;
 import com.tlregen.api.resourcegen.data.TLReGenForgeBiomeModifier;
 import com.tlregen.api.resourcegen.data.tags.TLReGenTagsBlocks;
+import com.tlregen.api.resourcegen.data.tags.TLReGenTagsItems;
 import com.tlregen.api.resourcegen.data.worldgen.TLReGenWorldgenBiome;
 import com.tlregen.api.resourcegen.data.worldgen.TLReGenWorldgenConfiguredFeature;
 import com.tlregen.api.resourcegen.data.worldgen.TLReGenWorldgenDensityFunction;
@@ -47,7 +48,10 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagBuilder;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -77,8 +81,6 @@ public class MasterResourceGenerator {
 	public static String modID;
 	protected final DynamicOps<JsonElement> dynamicOps = JsonOps.INSTANCE;
 
-	public static TLReGenTagsBlocks TagBlocks;
-
 	private Set<Supplier<DataProvider>> dataProviders = Collections.emptySet();
 
 	private Supplier<Map<ResourceLocation, List<SpriteSource>>> atlases;
@@ -90,6 +92,8 @@ public class MasterResourceGenerator {
 	private Supplier<Map<ResourceLocation, List<String>>> particles;
 	private Supplier<Map<ResourceLocation, TLReGenPostShader>> postShaders;
 	private Supplier<Map<String, TLReGenSoundDefinition>> sounds;
+	private Supplier<Map<TagKey<Block>, TagBuilder>> tagsBlocks;
+	private Supplier<Map<TagKey<Item>, TagBuilder>> tagsItems;
 	private Supplier<DynamicRegister<Biome>> biomes;
 	private Supplier<DynamicRegister<BiomeModifier>> biomeModifiers;
 	private Supplier<DynamicRegister<ConfiguredFeature<?, ?>>> configuredFeatures;
@@ -208,6 +212,14 @@ public class MasterResourceGenerator {
 		this.structureTemplatePools = structureTemplatePools;
 	}
 
+	public void addTagsBlocks(Supplier<Map<TagKey<Block>, TagBuilder>> tagsBlocks) {
+		this.tagsBlocks = tagsBlocks;
+	}
+
+	public void addTagsItems(Supplier<Map<TagKey<Item>, TagBuilder>> tagsItems) {
+		this.tagsItems = tagsItems;
+	}
+
 	@SubscribeEvent
 	public void addGenerators(final GatherDataEvent eventIn) {
 		;
@@ -283,13 +295,16 @@ public class MasterResourceGenerator {
 		if (structureTemplatePools != null) {
 			generator.addProvider(eventIn.includeClient(), new TLReGenWorldgenTemplatePool(structureTemplatePools.get(), modID, packOutput));
 		}
+		if (tagsBlocks != null) {
+			generator.addProvider(eventIn.includeClient(), new TLReGenTagsBlocks(tagsBlocks.get(), modID, packOutput));
+		}
+		if (tagsItems != null) {
+			generator.addProvider(eventIn.includeClient(), new TLReGenTagsItems(tagsItems.get(), modID, packOutput));
+		}
 
 		dataProviders.forEach((dataProviderSupplier) -> {
 			DataProvider dataProvider = dataProviderSupplier.get();
 			generator.addProvider(eventIn.includeServer(), dataProvider);
-			if (dataProvider instanceof TLReGenTagsBlocks) {
-				TagBlocks = (TLReGenTagsBlocks) dataProvider;
-			}
 		});
 	}
 }

@@ -37,7 +37,6 @@ public abstract class TLReGenTagsWorldgenBiome extends MasterResourceGenerator i
 	private final CompletableFuture<TagsProvider.TagLookup<Biome>> parentProvider = CompletableFuture.completedFuture(TagsProvider.TagLookup.empty());
 	protected final ResourceKey<? extends Registry<Biome>> registryKey = Registries.BIOME;
 	private final net.minecraftforge.common.data.ExistingFileHelper.IResourceType resourceType = new net.minecraftforge.common.data.ExistingFileHelper.ResourceType(net.minecraft.server.packs.PackType.SERVER_DATA, ".json", TagManager.getTagDir(Registries.BIOME));
-	private final net.minecraftforge.common.data.ExistingFileHelper.IResourceType elementResourceType = new net.minecraftforge.common.data.ExistingFileHelper.ResourceType(net.minecraft.server.packs.PackType.SERVER_DATA, ".json", net.minecraftforge.common.ForgeHooks.prefixNamespace(Registries.BIOME.location()));
 
 	/**
 	 * OVERRIDE ME TO ADD BLOCK TAGS
@@ -46,7 +45,6 @@ public abstract class TLReGenTagsWorldgenBiome extends MasterResourceGenerator i
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		CompletableFuture<?> completable = CompletableFuture.allOf();
 
 		record CombinedData<T>(HolderLookup.Provider contents, TagsProvider.TagLookup<T> parent) {
 		}
@@ -61,7 +59,6 @@ public abstract class TLReGenTagsWorldgenBiome extends MasterResourceGenerator i
 		}).thenCombineAsync(parentProvider, (provider, tagLookup) -> {
 			return new CombinedData<>(provider, tagLookup);
 		}).thenCompose((combinedData) -> {
-			HolderLookup.RegistryLookup<Biome> registrylookup = combinedData.contents.lookup(registryKey).get();
 
 			return CompletableFuture.allOf(blockTags.entrySet().stream().map((p_255499_) -> {
 				ResourceLocation resourcelocation = p_255499_.getKey();

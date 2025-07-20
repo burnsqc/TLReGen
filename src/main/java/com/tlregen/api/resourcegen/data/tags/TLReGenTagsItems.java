@@ -16,13 +16,13 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagFile;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.Item;
 
-public class TLReGenTagsBlocks extends TLReGenResourceGenerator {
-	private Map<TagKey<Block>, TagBuilder> resources = new HashMap<>();
+public class TLReGenTagsItems extends TLReGenResourceGenerator {
+	private Map<TagKey<Item>, TagBuilder> resources = new HashMap<>();
 
-	public TLReGenTagsBlocks(Map<TagKey<Block>, TagBuilder> resources, String modID, PackOutput packOutput) {
-		super(modID, Types.TAGS_BLOCKS, packOutput);
+	public TLReGenTagsItems(Map<TagKey<Item>, TagBuilder> resources, String modID, PackOutput packOutput) {
+		super(modID, Types.TAGS_ITEMS, packOutput);
 		this.resources = resources;
 	}
 

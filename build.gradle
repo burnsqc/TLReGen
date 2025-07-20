@@ -3,6 +3,7 @@ plugins {
     id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'com.diffplug.eclipse.apt' version '4.3.0'
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
@@ -87,7 +88,7 @@ tasks.named('jar', Jar).configure {
         ])
     }
 	//The following line should be commented out in dev, but uncommented when making a jar
-    finalizedBy 'reobfJar'
+    //finalizedBy 'reobfJar'
 }
 
 artifacts {
@@ -97,7 +98,7 @@ artifacts {
 
 publishing {
     publications {
-        register('TLReGen', MavenPublication) {
+        TLReGen(MavenPublication) {
             artifact jar
             artifact sourcesJar
             artifact javadocJar
@@ -108,10 +109,10 @@ publishing {
             name = "Local"
             url = uri(file("${project.projectDir}/../../Maven"))
         }
-        maven { 
-            name = "Remote"
-            url "file:///${project.projectDir}/maven2" 
-        }
+        //maven { 
+        //    name = "Remote"
+        //    url "file:///${project.projectDir}/maven2" 
+        //}
     }
 }
 

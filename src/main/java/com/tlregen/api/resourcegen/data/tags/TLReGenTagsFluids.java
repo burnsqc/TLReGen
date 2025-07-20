@@ -54,7 +54,6 @@ public abstract class TLReGenTagsFluids extends MasterResourceGenerator implemen
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		CompletableFuture<?> completable = CompletableFuture.allOf();
 
 		record CombinedData<T>(HolderLookup.Provider contents, TagsProvider.TagLookup<T> parent) {
 		}

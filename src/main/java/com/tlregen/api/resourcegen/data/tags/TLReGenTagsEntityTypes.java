@@ -54,7 +54,6 @@ public abstract class TLReGenTagsEntityTypes extends MasterResourceGenerator imp
 
 	@Override
 	public CompletableFuture<?> run(final CachedOutput cache) {
-		CompletableFuture<?> completable = CompletableFuture.allOf();
 
 		record CombinedData<T>(HolderLookup.Provider contents, TagsProvider.TagLookup<T> parent) {
 		}

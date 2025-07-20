@@ -49,7 +49,9 @@ public abstract class TLReGenResourceGenerator implements DataProvider {
 		SOUND(PackOutput.Target.RESOURCE_PACK, "sounds", ""),
 		STRUCTURE(PackOutput.Target.DATA_PACK, "worldgen.structure", "worldgen/structure"), 
 		STRUCTURE_SET(PackOutput.Target.DATA_PACK, "worldgen.structure_set", "worldgen/structure_set"), 
-		STRUCTURE_TEMPLATE_POOL(PackOutput.Target.DATA_PACK, "worldgen.template_pool", "worldgen/template_pool");
+		STRUCTURE_TEMPLATE_POOL(PackOutput.Target.DATA_PACK, "worldgen.template_pool", "worldgen/template_pool"),
+		TAGS_BLOCKS(PackOutput.Target.DATA_PACK, "tags.blocks", "tags/blocks"),
+		TAGS_ITEMS(PackOutput.Target.DATA_PACK, "tags.items", "tags/items");
 
 		final PackOutput.Target target;
 		final String subType;
